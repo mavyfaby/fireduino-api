@@ -1,21 +1,12 @@
 {
   "compilerOptions": {
+    "target": "es2016",
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
-    "noImplicitAny": true,
-    "moduleResolution": "node",
-    "sourceMap": false,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*",
-        "src/types/*"
-      ]
-    }
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"],
 }
