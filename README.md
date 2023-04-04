@@ -1,3 +1,13 @@
+# Fireduino Management API
+
+The Fireduino Management API is a Node.js API that allows to manage entire fireduino resources and devices.
+
+## Author
+
+- Maverick Fabroa
+
+## License
+
 Fireduino Non-Commercial License
 
 Copyright (c) 2023, Maverick Fabroa
