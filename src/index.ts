@@ -2,9 +2,12 @@ import express from "express";
 
 import { data, getPathname, isApiExist } from "./utils";
 import routes from "./routes";
+import helmet from "helmet";
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(helmet());
 
 // Catch all routes
 app.use("*", (request, response) => {

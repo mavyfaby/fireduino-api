@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { data } from "../utils";
 
 /**
- * 
+ * Login API
  * @param request  
  * @param response 
  */
