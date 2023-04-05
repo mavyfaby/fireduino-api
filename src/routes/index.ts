@@ -8,7 +8,7 @@ import { login } from '../api';
  * Fireduino API routes
  */
 const routes: FireduinoRoutes[] = [
-    { path: '/login', handler: login },
+    { path: '/login', methods: ["POST"], handler: login, },
 ];
 
 export default routes;

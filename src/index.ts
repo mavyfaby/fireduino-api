@@ -1,13 +1,23 @@
 import express from "express";
+import dotenv from "dotenv";
+
+import helmet from "helmet";
+import routes from "./routes";
+
+import type { HttpMethod } from "./types";
 
 import { data, getPathname, isApiExist } from "./utils";
-import routes from "./routes";
-import helmet from "helmet";
+import { handleNotFound, handleUnimplemented } from "./routes/handlers";
+import { FireduinoDatabase } from "./classes/database";
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(helmet());
+app.use(express.json());
 
 // Catch all routes
 app.use("*", (request, response) => {
@@ -20,13 +30,21 @@ app.use("*", (request, response) => {
   // If pathame is not an API
   if (!isApiExist(pathname)) {
     // Return 404
-    response.status(404).send(data(false, "Not found"));
+    handleNotFound(request, response);
     return;
   }
   
   // Otherwise, call the requested API
   for (const route of routes) {
     if (pathname === route.path) {
+      // If the method is not allowed
+      if (!route.methods.includes(request.method as HttpMethod)) {
+        // Return 405
+        handleUnimplemented(request, response);
+        break;
+      }
+
+      // Otherwise, call the handler
       route.handler(request, response);
       break;
     }
@@ -35,5 +53,9 @@ app.use("*", (request, response) => {
 
 // Start the server
 app.listen(port, () => {
+  // Initialize database
+  FireduinoDatabase.getInstance();
+
+
   console.log(`Fireduino API is listening on port ${port}`);
 });
