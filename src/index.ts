@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 
+import cors from "cors";
 import helmet from "helmet";
 import routes from "./routes";
 
@@ -14,7 +15,13 @@ import { FireduinoDatabase } from "./classes/database";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
+
+const domain = process.env.NODE_ENV === "production" ? "https://fireduino.cloud" : "http://127.0.0.1:3000";
+
+app.use(cors({
+  origin: domain
+}));
 
 app.use(helmet());
 app.use(express.json());
@@ -55,7 +62,5 @@ app.use("*", (request, response) => {
 app.listen(port, () => {
   // Initialize database
   FireduinoDatabase.getInstance();
-
-
   console.log(`Fireduino API is listening on port ${port}`);
 });

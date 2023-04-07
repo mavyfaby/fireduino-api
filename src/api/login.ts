@@ -13,7 +13,7 @@ export async function login(request: Request, response: Response) {
     let { user, pass } = request.body;
 
     // If one of them is not provided
-    if (!user || !pass) {
+    if (user === undefined || pass === undefined) {
         response.status(400).send(data(false, "Incomplete request!"));
         return;
     }
@@ -27,7 +27,7 @@ export async function login(request: Request, response: Response) {
         // If the credentials is not valid
         if (!result) {
             if (typeof result === "boolean") {
-                response.status(401).send(data(false, "Invalid credentials!"));
+                response.status(400).send(data(false, "Invalid credentials!"));
                 return;
             }
 
