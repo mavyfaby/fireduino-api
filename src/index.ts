@@ -16,7 +16,6 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 4000;
-
 const domain = process.env.NODE_ENV === "production" ? "https://fireduino.cloud" : "http://127.0.0.1:3000";
 
 app.use(cors({
