@@ -34,12 +34,17 @@ export class FireduinoDatabase {
     }
 
     /**
-     * Check if the login credentials is valid
-     * @param username Admin username
-     * @param password Password of the admin
+     * Query the database 
      */
-    public static checkLoginCredentials(username: string, password: string, callback: (result: boolean | null) => void) {
-        FireduinoDatabase.pool.query("SELECT password FROM admin WHERE username = ?", [username], (error, results) => {
+    public query(query: string, values: any[], callback: (error: mysql.MysqlError | null, results: any) => void) {
+        return FireduinoDatabase.pool.query(query, values, callback);
+    }
+
+    /**
+     * Check if the login credentials is valid
+     */
+    public checkLoginCredentials(username: string, password: string, callback: (result: boolean | null) => void) {
+        this.query("SELECT password FROM admin WHERE username = ?", [username], (error, results) => {
             // If there is an error
             if (error) {
                 // Reject the promise
@@ -48,7 +53,6 @@ export class FireduinoDatabase {
                 return;
             }
 
-            
             // If there is no result
             if (results.length === 0) {
                 // Reject the promise

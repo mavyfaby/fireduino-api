@@ -14,24 +14,28 @@ export async function login(request: Request, response: Response) {
 
     // If one of them is not provided
     if (user === undefined || pass === undefined) {
-        response.status(400).send(data(false, "Incomplete request!"));
+        response.send(data(false, "Incomplete request!"));
         return;
     }
+    
+    // Get database
+    const db = FireduinoDatabase.getInstance();
 
     // Trim the username and password
     user = user.trim();
     pass = pass.trim();
 
     // Check if username and password is valid
-    FireduinoDatabase.checkLoginCredentials(user, pass, (result) => {
-        // If the credentials is not valid
-        if (!result) {
-            if (typeof result === "boolean") {
-                response.status(400).send(data(false, "Invalid credentials!"));
-                return;
-            }
-
+    db.checkLoginCredentials(user, pass, (result) => {
+        // If has error
+        if (result === null) {
             response.status(500).send(data(false, "Internal server error!"));
+            return;
+        }
+
+        // If invalid credentials
+        if (!result) {
+            response.send(data(false, "Invalid credentials!"));
             return;
         }
 

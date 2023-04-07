@@ -23,7 +23,7 @@ app.use(cors({
 }));
 
 app.use(helmet());
-app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Catch all routes
 app.use("*", (request, response) => {
@@ -61,5 +61,6 @@ app.use("*", (request, response) => {
 app.listen(port, () => {
   // Initialize database
   FireduinoDatabase.getInstance();
+  // Log test
   console.log(`Fireduino API is listening on port ${port}`);
 });
