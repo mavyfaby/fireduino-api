@@ -16,7 +16,7 @@ export function handleNotFound(request: Request, response: Response) {
  * @param response 
  */
 export function handleUnauthorized(request: Request, response: Response) {
-    response.status(401).send('Unauthorized');
+    response.status(401).send(data(false, 'Unauthorized'));
 }
 
 /**

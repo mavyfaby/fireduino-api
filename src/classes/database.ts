@@ -43,8 +43,8 @@ export class FireduinoDatabase {
     /**
      * Check if the login credentials is valid
      */
-    public checkLoginCredentials(username: string, password: string, callback: (result: boolean | null) => void) {
-        this.query("SELECT password FROM admin WHERE username = ?", [username], (error, results) => {
+    public checkLoginCredentials(username: string, password: string, callback: (result: boolean | number | null) => void) {
+        this.query("SELECT id, password FROM admin WHERE username = ?", [username], (error, results) => {
             // If there is an error
             if (error) {
                 // Reject the promise
@@ -70,8 +70,18 @@ export class FireduinoDatabase {
                     return;
                 }
 
+                
+                // If the password is correct
+                if (result) {
+                    // Get user id
+                    const id = results[0].id;
+                    // Resolve the promise
+                    callback(id);
+                    return;
+                }
+
                 // Otherwise, resolve the promise
-                callback(result);
+                callback(false);
             });
         });
     }

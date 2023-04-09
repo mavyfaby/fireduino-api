@@ -6,10 +6,12 @@ import helmet from "helmet";
 import routes from "./routes";
 
 import type { HttpMethod } from "./types";
+import type { Request, Response } from "express";
 
-import { data, getPathname, isApiExist } from "./utils";
-import { handleNotFound, handleUnimplemented } from "./routes/handlers";
+import { handleNotFound, handleUnimplemented, handleUnauthorized } from "./routes/handlers";
+import { getPathname, isApiExist } from "./utils";
 import { FireduinoDatabase } from "./classes/database";
+import { FireduinoSession } from "./classes/session";
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +20,9 @@ const app = express();
 const port = process.env.PORT || 4000;
 const domain = process.env.NODE_ENV === "production" ? "https://fireduino.cloud" : "http://127.0.0.1:3000";
 
+// Initialize session
+const session = FireduinoSession.getInstance();
+
 app.use(cors({
   origin: domain
 }));
@@ -25,8 +30,16 @@ app.use(cors({
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 
+// Attach session middleware
+app.use(session.getMiddleware());
+
 // Catch all routes
-app.use("*", (request, response) => {
+app.use("*", (request: Request, response: Response) => {
+  // If the session is unauthorized
+  if (response.locals.isUnauthorized) {
+    return handleUnauthorized(request, response);
+  }
+
   // Get pathname
   const pathname = getPathname(request.originalUrl);
 

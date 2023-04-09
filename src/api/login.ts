@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import { data } from "../utils";
 import { FireduinoDatabase } from "../classes/database";
+import { FireduinoSession } from "../classes/session";
 
 /**
  * Login API
@@ -26,20 +27,24 @@ export async function login(request: Request, response: Response) {
     pass = pass.trim();
 
     // Check if username and password is valid
-    db.checkLoginCredentials(user, pass, (result) => {
+    db.checkLoginCredentials(user, pass, (userid) => {
         // If has error
-        if (result === null) {
+        if (userid === null) {
             response.status(500).send(data(false, "Internal server error!"));
             return;
         }
 
         // If invalid credentials
-        if (!result) {
+        if (typeof userid === "boolean" && !userid) {
             response.send(data(false, "Invalid credentials!"));
             return;
         }
 
+        // Get session instance
+        const session = FireduinoSession.getInstance();
+        // Generate a JWT token
+        const token = session.generateToken({ id: userid });
         // Otherwise, return 200
-        response.send(data(true, "Login successful!"));    
+        response.send(data(true, "Login successful!", token));    
     });
 }

@@ -2,13 +2,14 @@
 import type { FireduinoRoutes } from '../types';
 
 // Import endpoint functions
-import { login } from '../api';
+import { login, validate } from '../api';
 
 /**
  * Fireduino API routes
  */
 const routes: FireduinoRoutes[] = [
-    { path: '/login', methods: ["POST"], handler: login, },
+    { id: 0, path: '/validate', methods: ["POST"], handler: validate, },
+    { id: 1, path: '/login', methods: ["POST"], handler: login, },
 ];
 
 export default routes;
