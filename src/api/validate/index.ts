@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { data } from "../utils";
+import { data } from "../../utils";
 
 /**
  * Validate Token

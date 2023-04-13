@@ -1,6 +1,6 @@
 {
   "name": "fireduino-api",
-  "version": "1.0.0-pre.7",
+  "version": "1.0.0-pre.8",
   "description": "Official Fireduino API",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "helmet": "^6.1.1",
+    "helmet": "^6.1.5",
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1"
   },

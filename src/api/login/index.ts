@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 
-import { data } from "../utils";
-import { FireduinoDatabase } from "../classes/database";
-import { FireduinoSession } from "../classes/session";
+import { data } from "../../utils";
+import { FireduinoDatabase } from "../../classes/database";
+import { FireduinoSession } from "../../classes/session";
 
 /**
  * Login API
