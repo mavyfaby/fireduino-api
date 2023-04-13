@@ -7,7 +7,7 @@ import { data } from "../utils";
  * @param response 
  */
 export function handleNotFound(request: Request, response: Response) {
-    response.status(404).send(data(false, 'Not Found'));
+    response.status(404).send(data.error('Not Found'));
 }
 
 /**
@@ -16,7 +16,7 @@ export function handleNotFound(request: Request, response: Response) {
  * @param response 
  */
 export function handleUnauthorized(request: Request, response: Response) {
-    response.status(401).send(data(false, 'Unauthorized'));
+    response.status(401).send(data.error('Unauthorized'));
 }
 
 /**
@@ -25,5 +25,5 @@ export function handleUnauthorized(request: Request, response: Response) {
  * @param response 
  */
 export function handleUnimplemented(request: Request, response: Response) {
-    response.status(405).send(data(false, 'Method Not Allowed'));
+    response.status(405).send(data.error('Method Not Allowed'));
 }

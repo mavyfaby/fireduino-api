@@ -12,7 +12,8 @@ export class FireduinoDatabase {
 
   private static QUERIES = {
     LOGIN: "SELECT id, password FROM admin WHERE username = ?",
-    ADD_FIRE_DEPARTMENT: "INSERT INTO fire_departments (name, phone, address, latitude, longitude, date_stamp) VALUES (?, ?, ?, ?, ?, NOW())"
+    ADD_FIRE_DEPARTMENT: "INSERT INTO fire_departments (name, phone, address, latitude, longitude, date_stamp) VALUES (?, ?, ?, ?, ?, NOW())",
+    GET_FIRE_DEPARTMENTS: "SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f FROM fire_departments",
   };
 
   /**
@@ -110,6 +111,24 @@ export class FireduinoDatabase {
 
       // Otherwise, resolve the promise
       callback(results.insertId);
+    });
+  }
+
+  /**
+   * Get all fire departments
+   */
+  public getFireDepartments(callback: (result: FireDepartment[] | null) => void) {
+    this.query(FireduinoDatabase.QUERIES.GET_FIRE_DEPARTMENTS, [], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(results);
     });
   }
 }

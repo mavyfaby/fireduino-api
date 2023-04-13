@@ -9,5 +9,5 @@ import { data } from "../../utils";
  */
 export async function validate(request: Request, response: Response) {
     // Intentionally left blank
-    response.send(data(true, ""));
+    response.send(data.success());
 }

@@ -14,20 +14,20 @@ export async function department(request: Request, response: Response) {
   // Identify request method
   switch (request.method) {
     case "GET":
-      return _getDepartments(request, response);
+      return _getDepartment(request, response);
     case "POST":
       return _addDepartment(request, response);
   }
 }
 
 /**
- * Get Fire Departments
+ * Get Fire Department
  * @param request
  * @param response
  */
-function _getDepartments(request: Request, response: Response) {
+function _getDepartment(request: Request, response: Response) {
   // Intentionally left blank
-  response.send(data(true, "GET"));
+  response.send(data.success());
 }
 
 /**
@@ -47,7 +47,7 @@ function _addDepartment(request: Request, response: Response) {
       longitude === undefined) {
     
     // Return error
-    response.send(data(false, "Incomplete request!"));
+    response.send(data.error("Incomplete request!"));
     return;
   }
 
@@ -63,7 +63,7 @@ function _addDepartment(request: Request, response: Response) {
 
   // If there's an error
   if (errorMessage.length > 0) {
-    response.send(data(false, errorMessage));
+    response.send(data.error(errorMessage));
     return;
   }
 
@@ -78,12 +78,12 @@ function _addDepartment(request: Request, response: Response) {
   db.addFireDepartment(department, (result) => {
     // If has error
     if (result === null) {
-      response.status(500).send(data(false, "Internal server error!"));
+      response.status(500).send(data.error("Failed to add fire department!"));
       return;
     }
 
     // Otherwise, return 200
-    response.send(data(true, "Fire department added!"));
+    response.send(data.success("Fire department added!"));
   });
 }
 

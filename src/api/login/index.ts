@@ -15,7 +15,7 @@ export async function login(request: Request, response: Response) {
 
     // If one of them is not provided
     if (user === undefined || pass === undefined) {
-        response.send(data(false, "Incomplete request!"));
+        response.send(data.error("Incomplete request!"));
         return;
     }
     
@@ -30,13 +30,13 @@ export async function login(request: Request, response: Response) {
     db.checkLoginCredentials(user, pass, (userid) => {
         // If has error
         if (userid === null) {
-            response.status(500).send(data(false, "Internal server error!"));
+            response.status(500).send(data.error("Internal server error!"));
             return;
         }
 
         // If invalid credentials
         if (typeof userid === "boolean" && !userid) {
-            response.send(data(false, "Invalid credentials!"));
+            response.send(data.error("Invalid credentials!"));
             return;
         }
 
@@ -45,6 +45,6 @@ export async function login(request: Request, response: Response) {
         // Generate a JWT token
         const token = session.generateToken({ id: userid });
         // Otherwise, return 200
-        response.send(data(true, "Login successful!", token));    
+        response.send(data.success("Login successful!", token));    
     });
 }
