@@ -1,61 +1,62 @@
 import type { Request, Response } from "express";
 
-import { FireDepartment } from "../../types";
+import { Establishment } from "../../types";
 import { FireduinoDatabase } from "../../classes/database";
 import { data, validateEntity } from "../../utils";
 
 /**
- * Fire Department API
+ * Establishment API
  * @param request  
  * @param response 
  */
-export async function department(request: Request, response: Response) {
+export async function establishment(request: Request, response: Response) {
   // Identify request method
   switch (request.method) {
     case "GET":
-      return _getDepartment(request, response);
+      return _getEstablishment(request, response);
     case "POST":
-      return _addDepartment(request, response);
+      return _addEstablishment(request, response);
     case "PUT":
-      return _editDepartment(request, response);
+      return _editEstablishment(request, response);
   }
 }
 
 /**
- * Get Fire Department
+ * Get Establishment
  * @param request
  * @param response
  */
-function _getDepartment(request: Request, response: Response) {
+function _getEstablishment(request: Request, response: Response) {
   // Intentionally left blank
   response.send(data.success());
 }
 
 /**
- * Edit Fire Department
+ * Edit Establishment
  * @param request
  * @param response
  */
-function _editDepartment(request: Request, response: Response) {
+function _editEstablishment(request: Request, response: Response) {
   // Intentionally left blank
   response.send(data.success());
 }
 
 /**
- * Add Fire Department
+ * Add Establishment
  * @param request
  * @param response
  */
-function _addDepartment(request: Request, response: Response) {
+function _addEstablishment(request: Request, response: Response) {
   // Get inputs
-  let { name, phone, address, latitude, longitude } = request.body;
+  let { name, phone, address, latitude, longitude, inviteKey } = request.body;
 
   // If one of them is not provided
   if (name === undefined ||
       phone === undefined ||
       address === undefined ||
       latitude === undefined ||
-      longitude === undefined) {
+      longitude === undefined ||
+      inviteKey === undefined) {
     
     // Return error
     response.send(data.error("Incomplete request!"));
@@ -68,6 +69,7 @@ function _addDepartment(request: Request, response: Response) {
   address = address.trim();
   latitude = latitude.trim();
   longitude = longitude.trim();
+  inviteKey = inviteKey.trim();
 
   // Validate inputs
   const errorMessage = validateEntity(name, phone, address, latitude, longitude);
@@ -78,23 +80,24 @@ function _addDepartment(request: Request, response: Response) {
     return;
   }
 
-  // Fire Department data
-  const department: FireDepartment = {
-    name, phone, address, latitude, longitude
+  // Establishment data
+  const establishment: Establishment = {
+    name, phone, invite_key: inviteKey, address, latitude, longitude
   };
 
   // Get database instance
   const db = FireduinoDatabase.getInstance();
 
-  // Add department
-  db.addFireDepartment(department, (result) => {
+  // Add Establishment
+  db.addEstablishment(establishment, (result) => {
     // If has error
     if (result === null) {
-      response.status(500).send(data.error("Failed to add fire department!"));
+      response.status(500).send(data.error("Failed to add establishment!"));
       return;
     }
 
     // Otherwise, return 200
-    response.send(data.success("Fire department added!"));
+    response.send(data.success("Establishment added!"));
   });
 }
+

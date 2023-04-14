@@ -3,7 +3,6 @@ import type { Request, Response } from "express";
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD";
 
 export type FireduinoRoutes = {
-  id?: number,
   path: string;
   methods: HttpMethod[];
   handler: (request: Request, response: Response) => void;
@@ -16,4 +15,8 @@ export type FireDepartment = {
   address: string;
   latitude: string;
   longitude: string;
+};
+
+export type Establishment = FireDepartment & {
+  invite_key: string;
 }

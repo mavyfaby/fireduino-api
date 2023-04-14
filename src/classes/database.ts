@@ -1,4 +1,4 @@
-import type { FireDepartment } from "../types";
+import type { Establishment, FireDepartment } from "../types";
 
 import mysql from "mysql";
 import bcrypt from "bcrypt";
@@ -14,6 +14,8 @@ export class FireduinoDatabase {
     LOGIN: "SELECT id, password FROM admin WHERE username = ?",
     ADD_FIRE_DEPARTMENT: "INSERT INTO fire_departments (name, phone, address, latitude, longitude, date_stamp) VALUES (?, ?, ?, ?, ?, NOW())",
     GET_FIRE_DEPARTMENTS: "SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f FROM fire_departments",
+    ADD_ESTABLISHMENT: "INSERT INTO establishments (name, invite_key, phone, address, latitude, longitude, date_stamp) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+    GET_ESTABLISHMENTS: "SELECT id AS a, invite_key AS b, name AS c, phone AS d, address AS e, latitude AS f, longitude AS g FROM establishments",
   };
 
   /**
@@ -119,6 +121,44 @@ export class FireduinoDatabase {
    */
   public getFireDepartments(callback: (result: FireDepartment[] | null) => void) {
     this.query(FireduinoDatabase.QUERIES.GET_FIRE_DEPARTMENTS, [], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(results);
+    });
+  }
+
+  /**
+   * Add establishment
+   */
+  public addEstablishment(establishment: Establishment, callback: (result: boolean | number | null) => void) {
+    const { name, phone, address, latitude, longitude, invite_key } = establishment;
+
+    this.query(FireduinoDatabase.QUERIES.ADD_ESTABLISHMENT, [name, invite_key, phone, address, latitude, longitude], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(results.insertId);
+    });
+  }
+
+  /**
+   * Get all establishments
+   */
+  public getEstablishments(callback: (result: Establishment[] | null) => void) {
+    this.query(FireduinoDatabase.QUERIES.GET_ESTABLISHMENTS, [], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise

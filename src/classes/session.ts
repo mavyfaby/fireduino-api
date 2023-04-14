@@ -40,7 +40,7 @@ export class FireduinoSession {
   public getMiddleware() {
     return (request: Request, response: Response, next: Function) => {
       // If the request is NOT in login API
-      if (request.originalUrl !== routes.find(r => r.id === 1)?.path) {
+      if (request.originalUrl !== routes.find(r => r.path === '/login')?.path) {
         // Get the token from the request header
         const token = request.headers.authorization?.split(" ")[1];
 

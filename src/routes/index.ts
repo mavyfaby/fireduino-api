@@ -5,15 +5,21 @@ import type { FireduinoRoutes } from '../types';
 import { login, validate } from '../api';
 import { department } from '../api/department';
 import { departments } from '../api/departments';
+import { establishment } from '../api/establishment';
+import { establishments } from '../api/establishments';
+import { inviteKey } from '../api/invitekey';
 
 /**
  * Fireduino API routes
  */
 const routes: FireduinoRoutes[] = [
-    { id: 0, path: '/validate', methods: ["POST"], handler: validate, },
-    { id: 1, path: '/login', methods: ["POST"], handler: login, },
-    { id: 2, path: '/department', methods: ["GET", "POST"], handler: department, },
-    { id: 3, path: '/departments', methods: ["GET"], handler: departments, },
+    { path: '/invitekey', methods: ["GET"], handler: inviteKey, },
+    { path: '/validate', methods: ["POST"], handler: validate, },
+    { path: '/login', methods: ["POST"], handler: login, },
+    { path: '/department', methods: ["GET", "POST", "PUT"], handler: department, },
+    { path: '/departments', methods: ["GET"], handler: departments, },
+    { path: '/establishment', methods: ["GET", "POST", "PUT"], handler: establishment, },
+    { path: '/establishments', methods: ["GET"], handler: establishments, },
 ];
 
 export default routes;
