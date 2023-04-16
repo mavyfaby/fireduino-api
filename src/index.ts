@@ -9,7 +9,7 @@ import type { HttpMethod } from "./types";
 import type { Request, Response } from "express";
 
 import { handleNotFound, handleUnimplemented, handleUnauthorized } from "./routes/handlers";
-import { getPathname, isApiExist } from "./utils";
+import { getPathname, isApiExist, tb64 } from "./utils";
 import { FireduinoDatabase } from "./classes/database";
 import { FireduinoSession } from "./classes/session";
 
@@ -45,13 +45,14 @@ app.use("*", (request: Request, response: Response) => {
 
   // Set default content type
   response.setHeader("Content-Type", "application/json");
-
+  
   // If pathame is not an API
   if (!isApiExist(pathname)) {
     // Return 404
     handleNotFound(request, response);
     return;
   }
+
   
   // Otherwise, call the requested API
   for (const route of routes) {
@@ -63,6 +64,13 @@ app.use("*", (request: Request, response: Response) => {
         break;
       }
 
+      // Get session instance
+      const session = FireduinoSession.getInstance();
+      // Generate new token
+      const token = session.generateToken({ id: response.locals.uid });
+      // Reset JWT session expiration
+      response.setHeader("Access-Control-Expose-Headers", "Authorization");
+      response.setHeader("Authorization", `Bearer ${tb64(token)}`);
       // Otherwise, call the handler
       route.handler(request, response);
       break;

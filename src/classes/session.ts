@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { sign, verify } from "jsonwebtoken";
 
 import routes from "../routes";
-import { data } from '../utils';
+import { rb64 } from '../utils';
 
 export class FireduinoSession {
   private static instance: FireduinoSession;
@@ -52,7 +52,8 @@ export class FireduinoSession {
 
         // Verify the token
         try {
-          verify(token, this.secret, { algorithms: ["HS256"] });
+          const data: any = verify(rb64(token), this.secret, { algorithms: ["HS256"] });
+          response.locals.uid = data.uid;
         }
         
         // If the token is invalid

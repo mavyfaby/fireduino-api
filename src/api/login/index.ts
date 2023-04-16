@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { data } from "../../utils";
+import { data, tb64 } from "../../utils";
 import { FireduinoDatabase } from "../../classes/database";
 import { FireduinoSession } from "../../classes/session";
 
@@ -43,8 +43,8 @@ export async function login(request: Request, response: Response) {
         // Get session instance
         const session = FireduinoSession.getInstance();
         // Generate a JWT token
-        const token = session.generateToken({ id: userid });
+        const token = session.generateToken({ uid: userid });
         // Otherwise, return 200
-        response.send(data.success("Login successful!", token));    
+        response.send(data.success("Login successful!", tb64(token)));
     });
 }
