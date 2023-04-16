@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import { FireDepartment } from "../../types";
 import { FireduinoDatabase } from "../../classes/database";
-import { data, validateEntity } from "../../utils";
+import { data, validateFireDepartment } from "../../utils";
 
 /**
  * Fire Department API
@@ -70,7 +70,7 @@ function _addDepartment(request: Request, response: Response) {
   longitude = longitude.trim();
 
   // Validate inputs
-  const errorMessage = validateEntity(name, phone, address, latitude, longitude);
+  const errorMessage = validateFireDepartment(name, phone, address, latitude, longitude);
 
   // If there's an error
   if (errorMessage.length > 0) {

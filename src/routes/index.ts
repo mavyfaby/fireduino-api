@@ -8,11 +8,13 @@ import { departments } from '../api/departments';
 import { establishment } from '../api/establishment';
 import { establishments } from '../api/establishments';
 import { inviteKey } from '../api/invitekey';
+import { config } from '../api/config';
 
 /**
  * Fireduino API routes
  */
 const routes: FireduinoRoutes[] = [
+    { path: '/config', methods: ["GET"], handler: config, },
     { path: '/invitekey', methods: ["GET"], handler: inviteKey, },
     { path: '/validate', methods: ["POST"], handler: validate, },
     { path: '/login', methods: ["POST"], handler: login, },

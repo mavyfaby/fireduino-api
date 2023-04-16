@@ -17,6 +17,10 @@ export type FireDepartment = {
   longitude: string;
 };
 
-export type Establishment = FireDepartment & {
+export type Establishment = {
+  id?: number;
+  name: string;
+  phone: string;
+  address: string;
   invite_key: string;
 }

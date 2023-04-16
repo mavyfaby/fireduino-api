@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import { Establishment } from "../../types";
 import { FireduinoDatabase } from "../../classes/database";
-import { data, validateEntity } from "../../utils";
+import { data, validateEstablishment } from "../../utils";
 
 /**
  * Establishment API
@@ -48,14 +48,12 @@ function _editEstablishment(request: Request, response: Response) {
  */
 function _addEstablishment(request: Request, response: Response) {
   // Get inputs
-  let { name, phone, address, latitude, longitude, inviteKey } = request.body;
+  let { name, phone, address, inviteKey } = request.body;
 
   // If one of them is not provided
   if (name === undefined ||
       phone === undefined ||
       address === undefined ||
-      latitude === undefined ||
-      longitude === undefined ||
       inviteKey === undefined) {
     
     // Return error
@@ -67,12 +65,10 @@ function _addEstablishment(request: Request, response: Response) {
   name = name.trim();
   phone = phone.trim();
   address = address.trim();
-  latitude = latitude.trim();
-  longitude = longitude.trim();
   inviteKey = inviteKey.trim();
 
   // Validate inputs
-  const errorMessage = validateEntity(name, phone, address, latitude, longitude);
+  const errorMessage = validateEstablishment(name, phone, address, inviteKey);
 
   // If there's an error
   if (errorMessage.length > 0) {
@@ -82,7 +78,7 @@ function _addEstablishment(request: Request, response: Response) {
 
   // Establishment data
   const establishment: Establishment = {
-    name, phone, invite_key: inviteKey, address, latitude, longitude
+    name, phone, invite_key: inviteKey, address
   };
 
   // Get database instance

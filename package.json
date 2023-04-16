@@ -1,6 +1,6 @@
 {
   "name": "fireduino-api",
-  "version": "1.0.0-pre.10",
+  "version": "1.0.0-pre.11",
   "description": "Official Fireduino API",
   "main": "index.js",
   "scripts": {
