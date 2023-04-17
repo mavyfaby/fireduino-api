@@ -1,8 +1,8 @@
 {
   "name": "fireduino-api",
-  "version": "1.0.0-pre.12",
+  "version": "1.0.0-pre.13",
   "description": "Official Fireduino API",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo 'no test'",
     "build": "tsc",

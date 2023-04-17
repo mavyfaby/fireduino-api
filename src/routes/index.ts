@@ -2,26 +2,26 @@
 import type { FireduinoRoutes } from '../types';
 
 // Import endpoint functions
-import { login, validate } from '../api';
-import { department } from '../api/department';
-import { departments } from '../api/departments';
-import { establishment } from '../api/establishment';
-import { establishments } from '../api/establishments';
-import { inviteKey } from '../api/invitekey';
-import { config } from '../api/config';
+import { login, validate, department, departments, establishment, establishments, inviteKey, config } from '../api/admin';
 
 /**
  * Fireduino API routes
  */
 const routes: FireduinoRoutes[] = [
-    { path: '/config', methods: ["GET"], handler: config, },
-    { path: '/invitekey', methods: ["GET"], handler: inviteKey, },
-    { path: '/validate', methods: ["POST"], handler: validate, },
-    { path: '/login', methods: ["POST"], handler: login, },
-    { path: '/department', methods: ["GET", "POST", "PUT"], handler: department, },
-    { path: '/departments', methods: ["GET"], handler: departments, },
-    { path: '/establishment', methods: ["GET", "POST", "PUT"], handler: establishment, },
-    { path: '/establishments', methods: ["GET"], handler: establishments, },
+
+    // Admin API
+
+    { path: '/admin/config', methods: ["GET"], handler: config, },
+    { path: '/admin/invitekey', methods: ["GET"], handler: inviteKey, },
+    { path: '/admin/validate', methods: ["POST"], handler: validate, },
+    { path: '/admin/login', methods: ["POST"], handler: login, },
+    { path: '/admin/department', methods: ["GET", "POST", "PUT"], handler: department, },
+    { path: '/admin/departments', methods: ["GET"], handler: departments, },
+    { path: '/admin/establishment', methods: ["GET", "POST", "PUT"], handler: establishment, },
+    { path: '/admin/establishments', methods: ["GET"], handler: establishments, },
+
+    // Mobile Client API
+
 ];
 
 export default routes;

@@ -7,7 +7,7 @@ import { data } from "../utils";
  * @param response 
  */
 export function handleNotFound(request: Request, response: Response) {
-    response.status(404).send(data.error('Not Found'));
+    response.status(404).send(data.error('Request Not Found'));
 }
 
 /**

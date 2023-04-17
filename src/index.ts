@@ -35,17 +35,9 @@ app.use(session.getMiddleware());
 
 // Catch all routes
 app.use("*", (request: Request, response: Response) => {
-  // If the session is unauthorized
-  if (response.locals.isUnauthorized) {
-    return handleUnauthorized(request, response);
-  }
-
   // Get pathname
   const pathname = getPathname(request.originalUrl);
 
-  // Set default content type
-  response.setHeader("Content-Type", "application/json");
-  
   // If pathame is not an API
   if (!isApiExist(pathname)) {
     // Return 404
@@ -53,6 +45,13 @@ app.use("*", (request: Request, response: Response) => {
     return;
   }
 
+  // If the session is unauthorized
+  if (response.locals.isUnauthorized) {
+    return handleUnauthorized(request, response);
+  }
+
+  // Set default content type
+  response.setHeader("Content-Type", "application/json");
   
   // Otherwise, call the requested API
   for (const route of routes) {
