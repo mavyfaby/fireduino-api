@@ -13,9 +13,9 @@ export class FireduinoDatabase {
   private static QUERIES = {
     LOGIN: "SELECT id, password FROM admin WHERE username = ?",
     ADD_FIRE_DEPARTMENT: "INSERT INTO fire_departments (name, phone, address, latitude, longitude, date_stamp) VALUES (?, ?, ?, ?, ?, NOW())",
-    GET_FIRE_DEPARTMENTS: "SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f FROM fire_departments",
+    GET_FIRE_DEPARTMENTS: "SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f, date_stamp AS g FROM fire_departments",
     ADD_ESTABLISHMENT: "INSERT INTO establishments (name, invite_key, phone, address, date_stamp) VALUES (?, ?, ?, ?, NOW())",
-    GET_ESTABLISHMENTS: "SELECT id AS a, invite_key AS b, name AS c, phone AS d, address AS e FROM establishments",
+    GET_ESTABLISHMENTS: "SELECT id AS a, invite_key AS b, name AS c, phone AS d, address AS e, date_stamp AS f FROM establishments",
   };
 
   /**
