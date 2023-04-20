@@ -62,14 +62,18 @@ app.use("*", (request: Request, response: Response) => {
         handleUnimplemented(request, response);
         break;
       }
+      
+      // If the request is NOT in the login API
+      if (!response.locals.isLogin) {
+        // Get session instance
+        const session = FireduinoSession.getInstance();
+        // Generate new token
+        const token = session.generateToken({ id: response.locals.uid });
+        // Reset JWT session expiration
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
+        response.setHeader("Authorization", `Bearer ${tb64(token)}`);
+      }
 
-      // Get session instance
-      const session = FireduinoSession.getInstance();
-      // Generate new token
-      const token = session.generateToken({ id: response.locals.uid });
-      // Reset JWT session expiration
-      response.setHeader("Access-Control-Expose-Headers", "Authorization");
-      response.setHeader("Authorization", `Bearer ${tb64(token)}`);
       // Otherwise, call the handler
       route.handler(request, response);
       break;

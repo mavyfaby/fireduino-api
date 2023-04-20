@@ -9,6 +9,8 @@ export class FireduinoSession {
   private static instance: FireduinoSession;
   private secret: Secret;
 
+  private static adminLoginPath = '/admin/login';
+
   private constructor() {
     // If the JWT secret is not defined
     if (!process.env.JWT_SECRET) {
@@ -39,8 +41,11 @@ export class FireduinoSession {
    */
   public getMiddleware() {
     return (request: Request, response: Response, next: Function) => {
+      // Set {isLogin} to true if the request is in login API
+      response.locals.isLogin = request.originalUrl === FireduinoSession.adminLoginPath;
+
       // If the request is NOT in login API
-      if (request.originalUrl !== routes.find(r => r.path === '/admin/login')?.path) {
+      if (request.originalUrl !== routes.find(r => r.path === FireduinoSession.adminLoginPath)?.path) {
         // Get the token from the request header
         const token = request.headers.authorization?.split(" ")[1];
 
