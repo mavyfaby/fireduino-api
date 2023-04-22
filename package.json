@@ -1,17 +1,27 @@
 {
   "name": "fireduino-api",
-  "version": "1.0.0-pre.20",
+  "version": "1.0.0-pre.21",
   "description": "Official Fireduino API",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo 'no test'",
-    "build": "tsc",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
-    "start": "NODE_ENV=production node dist/index.js"
+    "start": "NODE_ENV=production node dist/index.js",
+    "build": "tsc"
   },
-  "keywords": [],
-  "author": "mavyfaby",
-  "license": "unlicensed",
+  "author": "Maverick Fabroa, Christine Lange, Jewel Cedrick Gesim",
+  "homepage": "https://github.com/mavyfaby/fireduino-api#readme",
+  "bugs": {
+    "url": "https://github.com/mavyfaby/fireduino-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mavyfaby/fireduino-api.git"
+  },
+  "keywords": [
+    "vue",
+    "material3"
+  ],
+  "license": "other",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
