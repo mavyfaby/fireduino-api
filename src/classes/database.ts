@@ -1,7 +1,8 @@
-import { Account, AccountType, CreateAccountData, ErrorCode, Establishment, FireDepartment, SearchParams } from "../types";
+import { AccountType, CreateUserData, ErrorCode, Establishment, FireDepartment, SearchParams, User } from "../types";
 
 import mysql from "mysql";
 import bcrypt from "bcrypt";
+import { FireduinoSession } from "./session";
 
 /**
  * Singleton class for fireduino database
@@ -45,7 +46,7 @@ export class FireduinoDatabase {
   /**
    * Check if the login credentials is valid
    */
-  public checkLoginCredentials(type: AccountType, username: string, password: string, callback: (result: boolean | Account | null) => void) {
+  public checkLoginCredentials(type: AccountType, username: string, password: string, callback: (result: boolean | User | null) => void) {
     this.query(`SELECT * FROM ${type === AccountType.ADMIN ? 'admin' : 'users'} WHERE username = ?`, [username], (error, results) => {
       // If there is an error
       if (error) {
@@ -76,7 +77,7 @@ export class FireduinoDatabase {
         // If the password is correct
         if (result) {
           // Create user data
-          const user: Account = {
+          const user: User = {
             id: results[0].id,
             username: results[0].username,
             first_name: results[0].firstname,
@@ -265,9 +266,63 @@ export class FireduinoDatabase {
   }
 
   /**
-   * Create an account
+   * Get user by id
+   * @param id 
+   * @param callback 
    */
-  public createAccount(data: CreateAccountData, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+  public getUserById(id: number, callback: (result: User | null, errorCode: ErrorCode | null) => void) {
+    this.query(
+      "SELECT id, username, email, firstname, lastname, establishment_id, date_stamp FROM users WHERE id = ?",
+      [id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.SYSTEM_ERROR);
+          return;
+        }
+
+        // If there is no result
+        if (results.length === 0) {
+          // Reject the promise
+          callback(null, ErrorCode.USER_NOT_FOUND);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(results[0], null);
+      }
+    );
+  }
+
+  /**
+   * Get user by token
+   * @param token 
+   * @param callback 
+   */
+  public getUserByToken(token: string, callback: (result: User | null, errorCode: ErrorCode | null) => void) {
+    // Get session
+    const session = FireduinoSession.getInstance();
+    // Get session data
+    const data = session.validateToken(token);
+
+    // If session data is an object
+    if (!data || typeof data !== "object") {
+      // Reject the promise
+      callback(null, ErrorCode.INVALID_TOKEN);
+      return;
+    }
+
+    // Convert uid to number
+    const uid = parseInt(data.uid);
+    // Get user by id
+    this.getUserById(uid, callback);
+  }
+
+  /**
+   * Add user account
+   */
+  public addUser(data: CreateUserData, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
     const { username, password, email, first_name, last_name, establishment_id, invite_key } = data;
 
     // Get establishment

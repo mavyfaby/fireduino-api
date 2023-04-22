@@ -10,7 +10,7 @@ export class FireduinoSession {
 
   private static unauthPaths = [
     this.loginPath, '/mobile/establishments', '/mobile/verify',
-    '/mobile/account', '/mobile/login', '/mobile/validate'
+    '/mobile/user', '/mobile/login', '/mobile/validate'
   ];
 
   private secret: Secret;
@@ -96,8 +96,7 @@ export class FireduinoSession {
    */
   public validateToken(token: any) {
     try {
-      verify(token, this.secret, { algorithms: ["HS256"] });
-      return true;
+      return verify(token, this.secret, { algorithms: ["HS256"] });
     }
     
     // If the token is invalid

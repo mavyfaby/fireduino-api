@@ -1,4 +1,4 @@
 export * from "./establishments";
-export * from "./account";
+export * from "./user";
 export * from "./login";
 export * from "./verify";

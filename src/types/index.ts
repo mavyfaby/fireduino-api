@@ -9,12 +9,14 @@ export type FireduinoRoutes = {
 }
 
 export enum ErrorCode {
-  SYSTEM_ERROR = 0,
-  ESTABLISHMENT_NOT_FOUND = 1,
-  INVITE_KEY = 2,
-  PASSWORD_HASH = 3,
-  ACCOUNT_CREATE = 4,
-  USERNAME_TAKEN = 5,
+  SYSTEM_ERROR,
+  ESTABLISHMENT_NOT_FOUND,
+  INVITE_KEY,
+  PASSWORD_HASH,
+  ACCOUNT_CREATE,
+  USERNAME_TAKEN,
+  USER_NOT_FOUND,
+  INVALID_TOKEN
 }
 
 export enum AccountType {
@@ -22,7 +24,7 @@ export enum AccountType {
   USER = 1,
 }
 
-export type Account = {
+export type User = {
   id?: number;
   establishment_id: number;
   first_name: string;
@@ -33,7 +35,7 @@ export type Account = {
   createdAt?: string;
 };
 
-export type CreateAccountData = Account & {
+export type CreateUserData = User & {
   invite_key: string;
 };
 
