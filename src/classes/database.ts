@@ -153,6 +153,34 @@ export class FireduinoDatabase {
   }
 
   /**
+   * Get establishment by id
+   */
+  public getEstablishmentById(id: number, callback: (result: Establishment | null) => void) {
+    this.query(
+      "SELECT id, name, phone, address, invite_key, date_stamp FROM establishments WHERE id = ?",
+      [id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
+
+        // If there is no result
+        if (results.length === 0) {
+          // Reject the promise
+          callback(null);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(results[0]);
+      }
+    );
+  }
+
+  /**
    * Get all establishments
    * @param params Search parameters
    */

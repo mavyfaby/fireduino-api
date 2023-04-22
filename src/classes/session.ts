@@ -9,7 +9,7 @@ export class FireduinoSession {
   private static loginPath = '/admin/login';
 
   private static unauthPaths = [
-    this.loginPath, '/mobile/establishments'
+    this.loginPath, '/mobile/establishments', '/mobile/verify',
   ];
 
   private secret: Secret;
