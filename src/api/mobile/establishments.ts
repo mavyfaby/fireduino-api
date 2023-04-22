@@ -10,18 +10,17 @@ import { FireduinoDatabase } from "../../classes/database";
  */
 export async function establishments(request: Request, response: Response) {
   // Get request params
-  let { search, nameOnly } = request.body;
+  let { search, nameOnly } = request.query;
 
   // If there is no search param, set to empty string
   if (!search) search = "";
   // Set {nameOnly} to boolean
-  nameOnly = nameOnly === "1";
-
+  const isNameOnly = nameOnly === "1";
   // Get database instance
   const db = FireduinoDatabase.getInstance();
 
   // Query the database
-  db.getEstablishments({ search, isNameOnly: nameOnly, limit: 5 }, (result) => {
+  db.getEstablishments({ search: search.toString(), isNameOnly, limit: 5 }, (result) => {
     // If there is an error
     if (result === null) {
       // Send error

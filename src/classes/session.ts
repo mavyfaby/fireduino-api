@@ -2,7 +2,7 @@ import type { Secret } from 'jsonwebtoken';
 import type { Request, Response } from 'express';
 import { sign, verify } from "jsonwebtoken";
 
-import { rb64 } from '../utils';
+import { getPathname, rb64 } from '../utils';
 
 export class FireduinoSession {
   private static instance: FireduinoSession;
@@ -44,13 +44,16 @@ export class FireduinoSession {
    */
   public getMiddleware() {
     return (request: Request, response: Response, next: Function) => {
+      // Get pathname
+      const pathname = getPathname(request.originalUrl);
+
       // Set {isLogin} to true if the request is in login API
-      response.locals.isLogin = request.originalUrl === FireduinoSession.loginPath;
+      response.locals.isLogin = pathname === FireduinoSession.loginPath;
 
       // If the request is NOT in login API
-      if (request.originalUrl !== FireduinoSession.loginPath) {
+      if (pathname !== FireduinoSession.loginPath) {
         // If the request doesn't need authentication
-        if (FireduinoSession.unauthPaths.includes(request.originalUrl)) {
+        if (FireduinoSession.unauthPaths.includes(pathname)) {
           return next();
         }
 
