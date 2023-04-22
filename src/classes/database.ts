@@ -1,4 +1,4 @@
-import type { Establishment, FireDepartment, SearchParams } from "../types";
+import { CreateAccountData, ErrorCode, Establishment, FireDepartment, SearchParams } from "../types";
 
 import mysql from "mysql";
 import bcrypt from "bcrypt";
@@ -227,6 +227,99 @@ export class FireduinoDatabase {
 
       // Otherwise, resolve the promise
       callback(results);
+    });
+  }
+
+  /**
+   * Check if username is taken
+   */
+  public isUsernameTaken(username: string, callback: (result: boolean | null) => void) {
+    this.query("SELECT id FROM users WHERE username = ?", [username], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // If there is no result
+      if (results.length === 0) {
+        // Reject the promise
+        callback(false);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(true);
+    });
+  }
+
+  /**
+   * Create an account
+   */
+  public createAccount(data: CreateAccountData, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+    const { username, password, email, first_name, last_name, establishment_id, invite_key } = data;
+
+    // Get establishment
+    this.getEstablishmentById(establishment_id, (establishment) => {
+      // If establishment not found
+      if (!establishment) {
+        callback(null, ErrorCode.ESTABLISHMENT_NOT_FOUND);
+        return;
+      }
+
+      // If the invite key is not valid
+      if (establishment.invite_key !== invite_key) {
+        // Reject the promise
+        callback(null, ErrorCode.INVITE_KEY);
+        return;
+      }
+
+      // Check if username is taken
+      this.isUsernameTaken(username, (isTaken) => {
+        // If username checking failed
+        if (isTaken === null) {
+          // Reject the promise
+          callback(null, ErrorCode.SYSTEM_ERROR);
+          return;
+        }
+
+        // If username is taken
+        if (isTaken) {
+          // Reject the promise
+          callback(null, ErrorCode.USERNAME_TAKEN);
+          return;
+        }
+
+        // Hash the password
+        bcrypt.hash(password, 10, (error, hash) => {
+          // If there is an error
+          if (error) {
+            // Reject the promise
+            console.error(error);
+            callback(null, ErrorCode.PASSWORD_HASH);
+            return;
+          }
+    
+          // Otherwise, insert the account
+          this.query(
+            "INSERT INTO users (establishment_id, username, firstname, lastname, email, password, date_stamp) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+            [establishment_id, username, first_name, last_name, email, hash], (error, results) => {
+              // If there is an error
+              if (error) {
+                // Reject the promise
+                console.error(error);
+                callback(null, ErrorCode.ACCOUNT_CREATE);
+                return;
+              }
+    
+              // Otherwise, resolve the promise
+              callback(results.insertId, null);
+            }
+          );
+        });
+      });
     });
   }
 }

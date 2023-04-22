@@ -8,6 +8,29 @@ export type FireduinoRoutes = {
   handler: (request: Request, response: Response) => void;
 }
 
+export enum ErrorCode {
+  SYSTEM_ERROR = 0,
+  ESTABLISHMENT_NOT_FOUND = 1,
+  INVITE_KEY = 2,
+  PASSWORD_HASH = 3,
+  ACCOUNT_CREATE = 4,
+  USERNAME_TAKEN = 5,
+}
+
+export type Account = {
+  id?: number;
+  establishment_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  username: string;
+  password: string;
+};
+
+export type CreateAccountData = Account & {
+  invite_key: string;
+};
+
 export type FireDepartment = {
   id?: number;
   name: string;
