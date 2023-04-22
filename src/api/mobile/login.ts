@@ -41,11 +41,22 @@ export async function login(request: Request, response: Response) {
         return;
     }
 
+    // Obfuscate account data keys
+    const obfuscated = {
+      a: account.id,
+      b: account.establishment_id,
+      c: account.username,
+      d: account.first_name,
+      e: account.last_name,
+      f: account.email,
+      g: account.createdAt,
+    };
+
     // Get session instance
     const session = FireduinoSession.getInstance();
     // Generate a JWT token
     const token = session.generateToken({ uid: account.id }, '30d');
     // Otherwise, return 200
-    response.send(data.success("Login successful!", account, token));
+    response.send(data.success("Login successful!", obfuscated, token));
   });
 }
