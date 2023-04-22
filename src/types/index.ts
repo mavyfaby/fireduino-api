@@ -24,3 +24,11 @@ export type Establishment = {
   address: string;
   invite_key: string;
 }
+
+export type SearchParams = {
+  search?: string;
+  isNameOnly?: boolean;
+  sortBy?: string;
+  sortDirection?: string;
+  limit?: number;
+};

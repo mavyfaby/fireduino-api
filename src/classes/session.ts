@@ -2,14 +2,17 @@ import type { Secret } from 'jsonwebtoken';
 import type { Request, Response } from 'express';
 import { sign, verify } from "jsonwebtoken";
 
-import routes from "../routes";
 import { rb64 } from '../utils';
 
 export class FireduinoSession {
   private static instance: FireduinoSession;
-  private secret: Secret;
+  private static loginPath = '/admin/login';
 
-  private static adminLoginPath = '/admin/login';
+  private static unauthPaths = [
+    this.loginPath, '/mobile/establishments'
+  ];
+
+  private secret: Secret;
 
   private constructor() {
     // If the JWT secret is not defined
@@ -42,10 +45,15 @@ export class FireduinoSession {
   public getMiddleware() {
     return (request: Request, response: Response, next: Function) => {
       // Set {isLogin} to true if the request is in login API
-      response.locals.isLogin = request.originalUrl === FireduinoSession.adminLoginPath;
+      response.locals.isLogin = request.originalUrl === FireduinoSession.loginPath;
 
       // If the request is NOT in login API
-      if (request.originalUrl !== routes.find(r => r.path === FireduinoSession.adminLoginPath)?.path) {
+      if (request.originalUrl !== FireduinoSession.loginPath) {
+        // If the request doesn't need authentication
+        if (FireduinoSession.unauthPaths.includes(request.originalUrl)) {
+          return next();
+        }
+
         // Get the token from the request header
         const token = request.headers.authorization?.split(" ")[1];
 

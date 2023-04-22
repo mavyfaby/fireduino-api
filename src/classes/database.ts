@@ -1,4 +1,4 @@
-import type { Establishment, FireDepartment } from "../types";
+import type { Establishment, FireDepartment, SearchParams } from "../types";
 
 import mysql from "mysql";
 import bcrypt from "bcrypt";
@@ -9,14 +9,6 @@ import bcrypt from "bcrypt";
 export class FireduinoDatabase {
   private static instance: FireduinoDatabase;
   private static pool: mysql.Pool;
-
-  private static QUERIES = {
-    LOGIN: "SELECT id, password FROM admin WHERE username = ?",
-    ADD_FIRE_DEPARTMENT: "INSERT INTO fire_departments (name, phone, address, latitude, longitude, date_stamp) VALUES (?, ?, ?, ?, ?, NOW())",
-    GET_FIRE_DEPARTMENTS: "SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f, date_stamp AS g FROM fire_departments",
-    ADD_ESTABLISHMENT: "INSERT INTO establishments (name, invite_key, phone, address, date_stamp) VALUES (?, ?, ?, ?, NOW())",
-    GET_ESTABLISHMENTS: "SELECT id AS a, invite_key AS b, name AS c, phone AS d, address AS e, date_stamp AS f FROM establishments",
-  };
 
   /**
    * Create a database connection pool
@@ -54,7 +46,7 @@ export class FireduinoDatabase {
    * Check if the login credentials is valid
    */
   public checkLoginCredentials(username: string, password: string, callback: (result: boolean | number | null) => void) {
-    this.query(FireduinoDatabase.QUERIES.LOGIN, [username], (error, results) => {
+    this.query("SELECT id, password FROM admin WHERE username = ?", [username], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
@@ -102,25 +94,28 @@ export class FireduinoDatabase {
   public addFireDepartment(department: FireDepartment, callback: (result: boolean | number | null) => void) {
     const { name, phone, address, latitude, longitude } = department;
 
-    this.query(FireduinoDatabase.QUERIES.ADD_FIRE_DEPARTMENT, [name, phone, address, latitude, longitude], (error, results) => {
-      // If there is an error
-      if (error) {
-        // Reject the promise
-        console.error(error);
-        callback(null);
-        return;
-      }
+    this.query(
+      "INSERT INTO fire_departments (name, phone, address, latitude, longitude, date_stamp) VALUES (?, ?, ?, ?, ?, NOW())",
+      [name, phone, address, latitude, longitude], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
 
-      // Otherwise, resolve the promise
-      callback(results.insertId);
-    });
+        // Otherwise, resolve the promise
+        callback(results.insertId);
+      }
+    );
   }
 
   /**
    * Get all fire departments
    */
   public getFireDepartments(callback: (result: FireDepartment[] | null) => void) {
-    this.query(FireduinoDatabase.QUERIES.GET_FIRE_DEPARTMENTS, [], (error, results) => {
+    this.query("SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f, date_stamp AS g FROM fire_departments", [], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
@@ -140,25 +135,60 @@ export class FireduinoDatabase {
   public addEstablishment(establishment: Establishment, callback: (result: boolean | number | null) => void) {
     const { name, phone, address, invite_key } = establishment;
 
-    this.query(FireduinoDatabase.QUERIES.ADD_ESTABLISHMENT, [name, invite_key, phone, address], (error, results) => {
-      // If there is an error
-      if (error) {
-        // Reject the promise
-        console.error(error);
-        callback(null);
-        return;
-      }
+    this.query(
+      "INSERT INTO establishments (name, invite_key, phone, address, date_stamp) VALUES (?, ?, ?, ?, NOW())",
+      [name, invite_key, phone, address], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
 
-      // Otherwise, resolve the promise
-      callback(results.insertId);
-    });
+        // Otherwise, resolve the promise
+        callback(results.insertId);
+      }
+    );
   }
 
   /**
    * Get all establishments
+   * @param params Search parameters
    */
-  public getEstablishments(callback: (result: Establishment[] | null) => void) {
-    this.query(FireduinoDatabase.QUERIES.GET_ESTABLISHMENTS, [], (error, results) => {
+  public getEstablishments(params: SearchParams, callback: (result: Establishment[] | null) => void) {
+    // Default search column
+    let columns = "invite_key AS b, name AS c, phone AS d, address AS e, date_stamp AS f";
+    let postFix = "ORDER BY date_stamp DESC";
+    let where = "";
+
+    // If has {search}
+    if (params.search) {
+        where = `WHERE name LIKE '%${params.search}%'`;
+    }
+
+    // If {nameOnly}
+    if (params.isNameOnly) {
+      columns = "name AS c";
+    }
+
+    // If has {sortBy}
+    if (params.sortBy) {
+      postFix = `ORDER BY ${params.sortBy} `;
+
+      // If has {sortOrder}
+      if (params.sortDirection) {
+        postFix += params.sortDirection;
+      }
+    }
+
+    // If has {limit}
+    if (params.limit) {
+      postFix += ` LIMIT ${params.limit}`;
+    }
+
+    // Query the databaes
+    this.query(`SELECT id AS a, ${columns} FROM establishments ${where} ${postFix}`, [], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise

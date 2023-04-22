@@ -9,11 +9,19 @@ import { FireduinoDatabase } from "../../classes/database";
  * @param response 
  */
 export async function establishments(request: Request, response: Response) {
+  // Get request params
+  let { search, nameOnly } = request.body;
+
+  // If there is no search param, set to empty string
+  if (!search) search = "";
+  // Set {nameOnly} to boolean
+  nameOnly = nameOnly === "1";
+
   // Get database instance
   const db = FireduinoDatabase.getInstance();
-  
-  // TODO: Integrate search feature
-  db.getEstablishments({}, (result) => {
+
+  // Query the database
+  db.getEstablishments({ search, isNameOnly: nameOnly, limit: 5 }, (result) => {
     // If there is an error
     if (result === null) {
       // Send error
