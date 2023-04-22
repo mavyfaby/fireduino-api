@@ -17,6 +17,11 @@ export enum ErrorCode {
   USERNAME_TAKEN = 5,
 }
 
+export enum AccountType {
+  ADMIN = 0,
+  USER = 1,
+}
+
 export type Account = {
   id?: number;
   establishment_id: number;
@@ -24,7 +29,8 @@ export type Account = {
   last_name: string;
   email: string;
   username: string;
-  password: string;
+  password?: string;
+  createdAt?: string;
 };
 
 export type CreateAccountData = Account & {

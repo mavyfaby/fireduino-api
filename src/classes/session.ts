@@ -10,7 +10,7 @@ export class FireduinoSession {
 
   private static unauthPaths = [
     this.loginPath, '/mobile/establishments', '/mobile/verify',
-    '/mobile/account'
+    '/mobile/account', '/mobile/login',
   ];
 
   private secret: Secret;
@@ -87,8 +87,9 @@ export class FireduinoSession {
 
   /**
    * Generate a JWT token
+   * @param data
    */
-  public generateToken(data: any) {
-    return sign(data, this.secret, { expiresIn: "10m" });
+  public generateToken(data: any, expiresIn?: string) {
+    return sign(data, this.secret, { expiresIn: expiresIn || "10m" });
   }
 }

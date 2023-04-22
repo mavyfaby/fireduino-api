@@ -58,7 +58,7 @@ export async function account(request: Request, response: Response) {
       }
 
       // Send error
-      response.status(500).send(data.error(message));
+      response.status(400).send(data.error(message));
       return;
     }
 

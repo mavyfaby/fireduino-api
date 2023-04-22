@@ -1,4 +1,4 @@
-import { CreateAccountData, ErrorCode, Establishment, FireDepartment, SearchParams } from "../types";
+import { Account, AccountType, CreateAccountData, ErrorCode, Establishment, FireDepartment, SearchParams } from "../types";
 
 import mysql from "mysql";
 import bcrypt from "bcrypt";
@@ -45,8 +45,8 @@ export class FireduinoDatabase {
   /**
    * Check if the login credentials is valid
    */
-  public checkLoginCredentials(username: string, password: string, callback: (result: boolean | number | null) => void) {
-    this.query("SELECT id, password FROM admin WHERE username = ?", [username], (error, results) => {
+  public checkLoginCredentials(type: AccountType, username: string, password: string, callback: (result: boolean | Account | null) => void) {
+    this.query(`SELECT * FROM ${type === AccountType.ADMIN ? 'admin' : 'users'} WHERE username = ?`, [username], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
@@ -75,10 +75,19 @@ export class FireduinoDatabase {
 
         // If the password is correct
         if (result) {
-          // Get user id
-          const id = results[0].id;
+          // Create user data
+          const user: Account = {
+            id: results[0].id,
+            username: results[0].username,
+            first_name: results[0].firstname,
+            last_name: results[0].lastname,
+            email: results[0].email,
+            establishment_id: results[0].establishment_id,
+            createdAt: results[0].date_stamp,
+          };
+
           // Resolve the promise
-          callback(id);
+          callback(user);
           return;
         }
 
@@ -293,7 +302,7 @@ export class FireduinoDatabase {
         }
 
         // Hash the password
-        bcrypt.hash(password, 10, (error, hash) => {
+        bcrypt.hash(password!, 10, (error, hash) => {
           // If there is an error
           if (error) {
             // Reject the promise

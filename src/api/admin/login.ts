@@ -3,9 +3,10 @@ import type { Request, Response } from "express";
 import { data, tb64 } from "../../utils";
 import { FireduinoDatabase } from "../../classes/database";
 import { FireduinoSession } from "../../classes/session";
+import { AccountType } from "../../types";
 
 /**
- * Login API
+ * Admin Login API
  * @param request  
  * @param response 
  */
@@ -27,7 +28,7 @@ export async function login(request: Request, response: Response) {
     pass = pass.trim();
 
     // Check if username and password is valid
-    db.checkLoginCredentials(user, pass, (userid) => {
+    db.checkLoginCredentials(AccountType.ADMIN, user, pass, (userid) => {
         // If has error
         if (userid === null) {
             response.status(500).send(data.error("Internal server error!"));
