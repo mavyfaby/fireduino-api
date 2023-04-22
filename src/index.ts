@@ -63,8 +63,8 @@ app.use("*", (request: Request, response: Response) => {
         break;
       }
       
-      // If the request is NOT in the login API
-      if (!response.locals.isLogin) {
+      // If the request is authorized
+      if (response.locals.needsAuth) {;
         // Get session instance
         const session = FireduinoSession.getInstance();
         // Generate new token

@@ -50,11 +50,16 @@ export class FireduinoSession {
 
       // Set {isLogin} to true if the request is in login API
       response.locals.isLogin = pathname === FireduinoSession.loginPath;
+      // Set {needsAuth} to true
+      response.locals.needsAuth = true;
 
       // If the request is NOT in login API
       if (pathname !== FireduinoSession.loginPath) {
         // If the request doesn't need authentication
         if (FireduinoSession.unauthPaths.includes(pathname)) {
+          // Set {needsAuth} to true
+          response.locals.needsAuth = false;
+          // Return next
           return next();
         }
 
@@ -91,7 +96,7 @@ export class FireduinoSession {
    */
   public validateToken(token: any) {
     try {
-      verify(rb64(token), this.secret, { algorithms: ["HS256"] });
+      verify(token, this.secret, { algorithms: ["HS256"] });
       return true;
     }
     
