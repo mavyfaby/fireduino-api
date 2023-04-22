@@ -10,7 +10,7 @@ export class FireduinoSession {
 
   private static unauthPaths = [
     this.loginPath, '/mobile/establishments', '/mobile/verify',
-    '/mobile/account', '/mobile/login',
+    '/mobile/account', '/mobile/login', '/mobile/validate'
   ];
 
   private secret: Secret;
@@ -82,6 +82,22 @@ export class FireduinoSession {
       }
 
       next();
+    }
+  }
+
+  /**
+   * Validate a JWT token if not expired
+   * @param token 
+   */
+  public validateToken(token: any) {
+    try {
+      verify(rb64(token), this.secret, { algorithms: ["HS256"] });
+      return true;
+    }
+    
+    // If the token is invalid
+    catch (error) {
+      return false;
     }
   }
 
