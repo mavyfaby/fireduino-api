@@ -27,7 +27,7 @@ export async function user(request: Request, response: Response) {
  */
 function getAccount(request: Request, response: Response) {
   // Get token from request
-  const { token } = request.body;
+  let { token } = request.query;
 
   // If there is no token
   if (!token) {
@@ -35,6 +35,9 @@ function getAccount(request: Request, response: Response) {
     response.status(400).send(data.error("Invalid request!"));
     return;
   }
+
+  // Trim token
+  token = token.toString().trim();
 
   // Get database instance
   const db = FireduinoDatabase.getInstance();
