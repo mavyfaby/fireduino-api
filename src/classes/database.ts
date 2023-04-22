@@ -289,8 +289,19 @@ export class FireduinoDatabase {
           return;
         }
 
+        // Create user data
+        const user: User = {
+          id: results[0].id,
+          username: results[0].username,
+          first_name: results[0].firstname,
+          last_name: results[0].lastname,
+          email: results[0].email,
+          establishment_id: results[0].establishment_id,
+          createdAt: results[0].date_stamp,
+        };
+
         // Otherwise, resolve the promise
-        callback(results[0], null);
+        callback(user, null);
       }
     );
   }

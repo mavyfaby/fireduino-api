@@ -43,9 +43,9 @@ function getAccount(request: Request, response: Response) {
   const db = FireduinoDatabase.getInstance();
 
   // Query the database
-  db.getUserByToken(token, (account, errorCode) => {
+  db.getUserByToken(token, (user, errorCode) => {
     // If there is an error
-    if (account === null) {
+    if (user === null) {
       // Declare default message 
       let message = "Something went wrong!";
 
@@ -67,13 +67,13 @@ function getAccount(request: Request, response: Response) {
 
     // Obfuscate account data keys
     const obfuscated = {
-      a: account.id,
-      b: account.establishment_id,
-      c: account.username,
-      d: account.first_name,
-      e: account.last_name,
-      f: account.email,
-      g: account.createdAt,
+      a: user.id,
+      b: user.establishment_id,
+      c: user.username,
+      d: user.first_name,
+      e: user.last_name,
+      f: user.email,
+      g: user.createdAt,
     };
 
     // Send data
