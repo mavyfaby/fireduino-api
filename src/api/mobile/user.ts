@@ -65,8 +65,19 @@ function getAccount(request: Request, response: Response) {
       return;
     }
 
+    // Obfuscate account data keys
+    const obfuscated = {
+      a: account.id,
+      b: account.establishment_id,
+      c: account.username,
+      d: account.first_name,
+      e: account.last_name,
+      f: account.email,
+      g: account.createdAt,
+    };
+
     // Send data
-    response.send(data.success("Success!", account));
+    response.send(data.success("Success!", obfuscated));
   });
 }
 
