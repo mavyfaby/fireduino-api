@@ -2,15 +2,20 @@ import type { Secret } from 'jsonwebtoken';
 import type { Request, Response } from 'express';
 import { sign, verify } from "jsonwebtoken";
 
-import { getPathname, rb64 } from '../utils';
+import { getPathname } from '../utils';
 
 export class FireduinoSession {
   private static instance: FireduinoSession;
   private static loginPath = '/admin/login';
 
   private static unauthPaths = [
-    this.loginPath, '/mobile/establishments', '/mobile/verify',
-    '/mobile/user', '/mobile/login', '/mobile/validate'
+    this.loginPath,
+    '/mobile/establishments',
+    '/mobile/verify',
+    '/mobile/user',
+    '/mobile/login',
+    '/mobile/validate',
+    '/admin/validate'
   ];
 
   private secret: Secret;
@@ -74,7 +79,7 @@ export class FireduinoSession {
 
         // Verify the token
         try {
-          const data: any = verify(rb64(token), this.secret, { algorithms: ["HS256"] });
+          const data: any = verify(token, this.secret, { algorithms: ["HS256"] });
           response.locals.uid = data.uid;
         }
         

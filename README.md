@@ -5,7 +5,7 @@ The Fireduino Management API is a Node.js API that allows to manage entire fired
 ## Author
 
 - [@mavyfaby](https://github.com/mavyfaby) Maverick Fabroa
-- [@Dino.tine](https://github.com/Christine23) Christine Lange
+- [@Dino.tine](https://github.com/Chrsitine23) Christine Lange
 - [@cedrickje20](https://github.com/cedrickje20) Jewel Cedrick Gesim
 
 ## License

@@ -9,7 +9,7 @@ import type { HttpMethod } from "./types";
 import type { Request, Response } from "express";
 
 import { handleNotFound, handleUnimplemented, handleUnauthorized } from "./routes/handlers";
-import { getPathname, isApiExist, tb64 } from "./utils";
+import { getPathname, isApiExist } from "./utils";
 import { FireduinoDatabase } from "./classes/database";
 import { FireduinoSession } from "./classes/session";
 
@@ -71,7 +71,7 @@ app.use("*", (request: Request, response: Response) => {
         const token = session.generateToken({ id: response.locals.uid });
         // Reset JWT session expiration
         response.setHeader("Access-Control-Expose-Headers", "Authorization");
-        response.setHeader("Authorization", `Bearer ${tb64(token)}`);
+        response.setHeader("Authorization", `Bearer ${token}`);
       }
 
       // Otherwise, call the handler

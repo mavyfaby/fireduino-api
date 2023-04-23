@@ -46,6 +46,6 @@ export async function login(request: Request, response: Response) {
         // Generate a JWT token
         const token = session.generateToken({ uid: userid });
         // Otherwise, return 200
-        response.send(data.success("Login successful!", tb64(token)));
+        response.send(data.success("Login successful!", token));
     });
 }

@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { data, rb64 } from "../utils";
+import { data } from "../utils";
 import { FireduinoSession } from "../classes/session";
 
 /**
@@ -22,7 +22,7 @@ export async function validate(request: Request, response: Response) {
   // Get session instance
   const session = FireduinoSession.getInstance();
   // Validate token
-  const isValid = session.validateToken(rb64(token));
+  const isValid = session.validateToken(token);
   // Send result
   response.send(isValid ? data.success("Valid token!") : data.error("Invalid token!"));
 }
