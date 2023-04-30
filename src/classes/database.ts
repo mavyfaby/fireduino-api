@@ -122,6 +122,29 @@ export class FireduinoDatabase {
   }
 
   /**
+   * Update a fire department
+   */
+  public updateFireDepartment(department: FireDepartment, callback: (result: boolean | null) => void) {
+    const { id, name, phone, address, latitude, longitude } = department;
+
+    this.query(
+      "UPDATE fire_departments SET name = ?, phone = ?, address = ?, latitude = ?, longitude = ? WHERE id = ?",
+      [name, phone, address, latitude, longitude, id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(true);
+      }
+    );
+  }
+
+  /**
    * Get all fire departments
    */
   public getFireDepartments(callback: (result: FireDepartment[] | null) => void) {

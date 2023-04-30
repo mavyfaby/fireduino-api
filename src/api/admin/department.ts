@@ -37,8 +37,10 @@ function _getDepartment(request: Request, response: Response) {
  * @param response
  */
 function _editDepartment(request: Request, response: Response) {
-  // Intentionally left blank
-  response.send(data.success());
+  // Set edit flag to true
+  response.locals.isEdit = true;
+  // Call add department
+  _addDepartment(request, response);
 }
 
 /**
@@ -85,6 +87,35 @@ function _addDepartment(request: Request, response: Response) {
 
   // Get database instance
   const db = FireduinoDatabase.getInstance();
+
+  // If edit flag is set
+  if (response.locals.isEdit) {
+    // Get id
+    const id = request.body.id;
+
+    // If id is not provided
+    if (id === undefined) {
+      response.send(data.error("Incomplete request!"));
+      return;
+    }
+
+    // Set id
+    department.id = id;
+
+    // Update fire department
+    db.updateFireDepartment(department, (result) => {
+      // If has error
+      if (result === null) {
+        response.status(500).send(data.error("Failed to update fire department!"));
+        return;
+      }
+
+      // Otherwise, return 200
+      response.send(data.success("Fire department updated!"));
+    });
+
+    return;
+  }
 
   // Add department
   db.addFireDepartment(department, (result) => {
