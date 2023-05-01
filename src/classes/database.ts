@@ -166,11 +166,11 @@ export class FireduinoDatabase {
    * Add establishment
    */
   public addEstablishment(establishment: Establishment, callback: (result: boolean | number | null) => void) {
-    const { name, phone, address, invite_key } = establishment;
+    const { name, phone, address, latitude, longitude, invite_key } = establishment;
 
     this.query(
-      "INSERT INTO establishments (name, invite_key, phone, address, date_stamp) VALUES (?, ?, ?, ?, NOW())",
-      [name, invite_key, phone, address], (error, results) => {
+      "INSERT INTO establishments (name, latitude, longitude, invite_key, phone, address, date_stamp) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+      [name, latitude, longitude, invite_key, phone, address], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise
@@ -181,6 +181,29 @@ export class FireduinoDatabase {
 
         // Otherwise, resolve the promise
         callback(results.insertId);
+      }
+    );
+  }
+
+  /**
+   * Update establishment
+   */
+  public updateEstablishment(establishment: Establishment, callback: (result: boolean | null) => void) {
+    const { id, name, phone, address, latitude, longitude } = establishment;
+
+    this.query(
+      "UPDATE establishments SET name = ?, latitude = ?, longitude = ?, phone = ?, address = ? WHERE id = ?",
+      [name, latitude, longitude, phone, address, id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(true);
       }
     );
   }
@@ -219,7 +242,7 @@ export class FireduinoDatabase {
    */
   public getEstablishments(params: SearchParams, callback: (result: Establishment[] | null) => void) {
     // Default search column
-    let columns = "invite_key AS b, name AS c, phone AS d, address AS e, date_stamp AS f";
+    let columns = "invite_key AS b, name AS c, phone AS d, address AS e, latitude AS f, longitude AS g, date_stamp AS h";
     let postFix = "ORDER BY date_stamp DESC";
     let where = "";
 

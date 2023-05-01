@@ -53,6 +53,8 @@ export type Establishment = {
   name: string;
   phone: string;
   address: string;
+  latitude: string;
+  longitude: string;
   invite_key: string;
 }
 
