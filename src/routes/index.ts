@@ -5,6 +5,7 @@ import type { FireduinoRoutes } from '../types';
 // Import endpoint functions
 import { login as loginAdmin, department, departments, establishment, establishments as aEstablishments, inviteKey, config } from '../api/admin';
 import { login as loginMobile, establishments as mEstablishments, verify, user, fireduino, fireduinos } from '../api/mobile';
+import { establishments as wEstablishments } from '../api/ws';
 
 // Import validation functions
 import { validate } from '../api/validate';
@@ -31,6 +32,9 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/validate', methods: ["POST"], handler: validate, },
     { path: '/mobile/fireduino', methods: ["POST", "GET"], handler: fireduino },
     { path: '/mobile/fireduinos', methods: ["GET"], handler: fireduinos },
+
+    // WebSocket API
+    { path: '/ws/establishments', methods: ["GET"], handler: wEstablishments },
 ];
 
 export default routes;
