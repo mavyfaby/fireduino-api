@@ -15,7 +15,8 @@ export class FireduinoSession {
     '/mobile/user',
     '/mobile/login',
     '/mobile/validate',
-    '/admin/validate'
+    '/admin/validate',
+    '/ws/establishments'
   ];
 
   private secret: Secret;
