@@ -291,7 +291,7 @@ export class FireduinoDatabase {
    */
   public getFireduinos(estbId: number, callback: (result: boolean | null) => void) {
     this.query(
-      "SELECT id AS a, serial_id AS b, name AS c, date_stamp AS d FROM devices WHERE estb_id = ?", [estbId], (error, results) => {
+      "SELECT id AS a, serial_id AS b, estb_id AS c, name AS d, date_stamp AS e FROM devices WHERE estb_id = ?", [estbId], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise

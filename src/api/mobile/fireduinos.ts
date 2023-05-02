@@ -21,7 +21,6 @@ export async function fireduinos(request: Request, response: Response) {
 
   // Convert id to number
   const est = Number(estbID);
-
   // Get database instance
   const db = FireduinoDatabase.getInstance();
 
