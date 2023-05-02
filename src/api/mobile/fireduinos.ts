@@ -10,7 +10,7 @@ import { FireduinoDatabase } from "../../classes/database";
  */
 export async function fireduinos(request: Request, response: Response) {
   // Get params
-  let { estbID } = request.body;
+  const { estbID } = request.query;
 
   // If there is no token
   if (!estbID) {
@@ -19,14 +19,14 @@ export async function fireduinos(request: Request, response: Response) {
     return;
   }
 
-  // Trim id's
-  estbID = estbID.toString().trim();
+  // Convert id to number
+  const est = Number(estbID);
 
   // Get database instance
   const db = FireduinoDatabase.getInstance();
 
   // Query the database
-  db.getFireduinos(estbID, (result) => {
+  db.getFireduinos(est, (result) => {
     if (result === null) {
       // Send error
       response.status(500).send(data.error("System Error [GT_FRDS]: Please report this bug!"));
