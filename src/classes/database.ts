@@ -213,7 +213,7 @@ export class FireduinoDatabase {
    */
   public getEstablishmentById(id: number, callback: (result: Establishment | null) => void) {
     this.query(
-      "SELECT id, name, phone, address, invite_key, date_stamp FROM establishments WHERE id = ?",
+      "SELECT id, name, phone, address, latitude, longitude, invite_key, date_stamp FROM establishments WHERE id = ?",
       [id], (error, results) => {
         // If there is an error
         if (error) {
@@ -284,6 +284,53 @@ export class FireduinoDatabase {
       // Otherwise, resolve the promise
       callback(results);
     });
+  }
+
+  /**
+   * Get establishment by establishment id and serial id 
+   */
+  public getFireduino(estbId: number, serialId: string, callback: (result: boolean | null) => void) {
+    this.query(
+      "SELECT * FROM devices WHERE estb_id = ? AND serial_id = ?", [estbId, serialId], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
+
+        // If there is no result
+        if (results.length === 0) {
+          // Reject the promise
+          callback(false);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(results[0]);
+      }
+    );
+  }
+
+  /**
+   * Add fireduino 
+   */
+  public addFireduino(estbId: number, serialId: string, name: string, callback: (result: boolean | null) => void) {
+    this.query(
+      "INSERT INTO devices (serial_id, estb_id, name, date_stamp) VALUES (?, ?, NOW())", [serialId, estbId, name], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(true);
+      }
+    );
   }
 
   /**
