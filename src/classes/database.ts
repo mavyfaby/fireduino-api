@@ -318,7 +318,7 @@ export class FireduinoDatabase {
    */
   public addFireduino(estbId: number, serialId: string, name: string, callback: (result: boolean | null) => void) {
     this.query(
-      "INSERT INTO devices (serial_id, estb_id, name, date_stamp) VALUES (?, ?, NOW())", [serialId, estbId, name], (error, results) => {
+      "INSERT INTO devices (serial_id, estb_id, name, date_stamp) VALUES (?, ?, ?, NOW())", [serialId, estbId, name], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise
