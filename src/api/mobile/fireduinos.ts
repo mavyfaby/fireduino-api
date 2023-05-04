@@ -33,6 +33,6 @@ export async function fireduinos(request: Request, response: Response) {
     }
     
     // Otherwise, send the fireduino's data
-    response.send(data.success(result));
+    response.send(data.success("Success", result));
   });
 }
