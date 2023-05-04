@@ -1,10 +1,21 @@
 // Import types
-// Import types
 import type { FireduinoRoutes } from '../types';
 
 // Import endpoint functions
-import { login as loginAdmin, department, departments, establishment, establishments as aEstablishments, inviteKey, config } from '../api/admin';
-import { login as loginMobile, establishments as mEstablishments, verify, user, fireduino, fireduinos } from '../api/mobile';
+import {
+    login as loginAdmin,
+    departments as aDepartments,
+    department, establishment,
+    establishments as aEstablishments, inviteKey, config
+} from '../api/admin';
+
+import {
+    login as loginMobile,
+    establishments as mEstablishments,
+    departments as mDepartments,
+    verify, user, fireduino, fireduinos
+} from '../api/mobile';
+
 import { establishments as wEstablishments } from '../api/ws';
 
 // Import validation functions
@@ -20,12 +31,13 @@ const routes: FireduinoRoutes[] = [
     { path: '/admin/validate', methods: ["POST"], handler: validate, },
     { path: '/admin/login', methods: ["POST"], handler: loginAdmin, },
     { path: '/admin/department', methods: ["GET", "POST", "PUT"], handler: department, },
-    { path: '/admin/departments', methods: ["GET"], handler: departments, },
+    { path: '/admin/departments', methods: ["GET"], handler: aDepartments, },
     { path: '/admin/establishment', methods: ["GET", "POST", "PUT"], handler: establishment, },
     { path: '/admin/establishments', methods: ["GET"], handler: aEstablishments, },
     
     // Mobile Client API
     { path: '/mobile/establishments', methods: ["GET"], handler: mEstablishments, },
+    { path: '/mobile/departments', methods: ["GET"], handler: mDepartments, },
     { path: '/mobile/verify', methods: ["POST"], handler: verify, },
     { path: '/mobile/user', methods: ["GET", "POST"], handler: user, },
     { path: '/mobile/login', methods: ["POST"], handler: loginMobile, },
