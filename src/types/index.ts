@@ -8,6 +8,16 @@ export type FireduinoRoutes = {
   handler: (request: Request, response: Response) => void;
 }
 
+export enum DatabaseTable {
+  ADMIN = "admin",
+  DEVICES = "devices",
+  ESTABLISHMENTS = "establishments",
+  DEPARTMENTS = "fire_departments",
+  INCIDENTS = "incidents",
+  REPORTS = "reports",
+  USERS = "users",
+}
+
 export enum ErrorCode {
   SYSTEM_ERROR,
   ESTABLISHMENT_NOT_FOUND,

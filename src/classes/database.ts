@@ -1,4 +1,7 @@
-import { AccountType, CreateUserData, ErrorCode, Establishment, FireDepartment, SearchParams, User } from "../types";
+import {
+  AccountType, CreateUserData, DatabaseTable, ErrorCode,
+  Establishment, FireDepartment, SearchParams, User
+} from "../types";
 
 import mysql from "mysql";
 import bcrypt from "bcrypt";
@@ -38,6 +41,9 @@ export class FireduinoDatabase {
 
   /**
    * Query the database 
+   * @param query Query string
+   * @param values Query values
+   * @param callback Callback function
    */
   public query(query: string, values: any[], callback: (error: mysql.MysqlError | null, results: any) => void) {
     return FireduinoDatabase.pool.query(query, values, callback);
@@ -45,6 +51,10 @@ export class FireduinoDatabase {
 
   /**
    * Check if the login credentials is valid
+   * @param type Account type
+   * @param username Username
+   * @param password Password
+   * @param callback Callback function
    */
   public checkLoginCredentials(type: AccountType, username: string, password: string, callback: (result: boolean | User | null) => void) {
     this.query(`SELECT * FROM ${type === AccountType.ADMIN ? 'admin' : 'users'} WHERE username = ?`, [username], (error, results) => {
@@ -100,6 +110,7 @@ export class FireduinoDatabase {
 
   /**
    * Add a fire department
+   * @param department Fire department
    */
   public addFireDepartment(department: FireDepartment, callback: (result: boolean | number | null) => void) {
     const { name, phone, address, latitude, longitude } = department;
@@ -123,6 +134,7 @@ export class FireduinoDatabase {
 
   /**
    * Update a fire department
+   * @param department Fire department
    */
   public updateFireDepartment(department: FireDepartment, callback: (result: boolean | null) => void) {
     const { id, name, phone, address, latitude, longitude } = department;
@@ -146,6 +158,7 @@ export class FireduinoDatabase {
 
   /**
    * Get all fire departments
+   * @param callback Callback function
    */
   public getFireDepartments(callback: (result: FireDepartment[] | null) => void) {
     this.query("SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f, date_stamp AS g FROM fire_departments", [], (error, results) => {
@@ -164,6 +177,8 @@ export class FireduinoDatabase {
 
   /**
    * Add establishment
+   * @param establishment Establishment
+   * @param callback Callback function
    */
   public addEstablishment(establishment: Establishment, callback: (result: boolean | number | null) => void) {
     const { name, phone, address, latitude, longitude, invite_key } = establishment;
@@ -187,6 +202,8 @@ export class FireduinoDatabase {
 
   /**
    * Update establishment
+   * @param establishment Establishment
+   * @param callback Callback function
    */
   public updateEstablishment(establishment: Establishment, callback: (result: boolean | null) => void) {
     const { id, name, phone, address, latitude, longitude } = establishment;
@@ -210,6 +227,8 @@ export class FireduinoDatabase {
 
   /**
    * Get establishment by id
+   * @param id Establishment id
+   * @param callback Callback function
    */
   public getEstablishmentById(id: number, callback: (result: Establishment | null) => void) {
     this.query(
@@ -239,6 +258,7 @@ export class FireduinoDatabase {
   /**
    * Get all establishments
    * @param params Search parameters
+   * @param callback Callback function
    */
   public getEstablishments(params: SearchParams, callback: (result: Establishment[] | null) => void) {
     // Default search column
@@ -288,6 +308,8 @@ export class FireduinoDatabase {
 
   /**
    * Get fireduinos by establishment id 
+   * @param estbId
+   * @param callback
    */
   public getFireduinos(estbId: number, callback: (result: boolean | null) => void) {
     this.query(
@@ -315,6 +337,9 @@ export class FireduinoDatabase {
 
   /**
    * Get establishment by establishment id and serial id 
+   * @param estbId
+   * @param serialId
+   * @param callback
    */
   public getFireduino(estbId: number, serialId: string, callback: (result: boolean | null) => void) {
     this.query(
@@ -342,6 +367,10 @@ export class FireduinoDatabase {
 
   /**
    * Add fireduino 
+   * @param estbId
+   * @param serialId
+   * @param name
+   * @param callback
    */
   public addFireduino(estbId: number, serialId: string, name: string, callback: (result: boolean | null) => void) {
     this.query(
@@ -362,6 +391,8 @@ export class FireduinoDatabase {
 
   /**
    * Check if username is taken
+   * @param username
+   * @param callback
    */
   public isUsernameTaken(username: string, callback: (result: boolean | null) => void) {
     this.query("SELECT id FROM users WHERE username = ?", [username], (error, results) => {
@@ -452,6 +483,8 @@ export class FireduinoDatabase {
 
   /**
    * Add user account
+   * @param data
+   * @param callback
    */
   public addUser(data: CreateUserData, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
     const { username, password, email, first_name, last_name, establishment_id, invite_key } = data;
@@ -515,6 +548,51 @@ export class FireduinoDatabase {
           );
         });
       });
+    });
+  }
+
+  /**
+   * Get row count by table
+   * @param table 
+   * @param callback 
+   */
+  public getCount(table: DatabaseTable, callback: (result: number | null) => void) {
+    this.query("SELECT COUNT(*) AS count FROM " + table, [], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(results[0].count);
+    });
+  }
+
+  /**
+   * Get incident count by year and quarter
+   * @param callback 
+   */
+  public getIncidentsCount(estbID: number, year: number, isQuarter12: boolean, callback: (result: number[] | null) => void) {
+    const col = "SUM(IF(MONTH(date_stamp) = ?, 1, 0))";
+    const query = `
+      SELECT ${col} AS a, ${col} AS b, ${col} AS c, ${col} AS d, ${col} AS e, ${col} AS f FROM incidents
+      WHERE estb_id = ? AND YEAR(date_stamp) = ? AND QUARTER(date_stamp) IN (?, ?)
+    `;
+
+    this.query(query, [ ...Array.from({ length: 6 }, (_, i) => i + (isQuarter12 ? 1 : 7)), estbID, year, isQuarter12 ? 1 : 3, isQuarter12 ? 2 : 4], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(Object.values(results[0]));
     });
   }
 }
