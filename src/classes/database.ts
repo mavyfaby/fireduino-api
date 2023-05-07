@@ -311,7 +311,7 @@ export class FireduinoDatabase {
    * @param estbId
    * @param callback
    */
-  public getFireduinos(estbId: number, callback: (result: boolean | null) => void) {
+  public getFireduinos(estbId: number, callback: (result: [] | null) => void) {
     this.query(
       "SELECT id AS a, serial_id AS b, estb_id AS c, name AS d, date_stamp AS e FROM devices WHERE estb_id = ?", [estbId], (error, results) => {
         // If there is an error
@@ -321,14 +321,7 @@ export class FireduinoDatabase {
           callback(null);
           return;
         }
-
-        // If there is no result
-        if (results.length === 0) {
-          // Reject the promise
-          callback(false);
-          return;
-        }
-
+        
         // Otherwise, resolve the promise
         callback(results);
       }
@@ -554,10 +547,11 @@ export class FireduinoDatabase {
   /**
    * Get row count by table
    * @param table 
+   * @param estbID
    * @param callback 
    */
-  public getCount(table: DatabaseTable, callback: (result: number | null) => void) {
-    this.query("SELECT COUNT(*) AS count FROM " + table, [], (error, results) => {
+  public getCount(table: DatabaseTable, estbID: number| null, callback: (result: number | null) => void) {
+    this.query("SELECT COUNT(*) AS count FROM " + table + (estbID == null ? '' : " WHERE estb_id = ?"), [estbID], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
@@ -569,6 +563,14 @@ export class FireduinoDatabase {
       // Otherwise, resolve the promise
       callback(results[0].count);
     });
+  }
+
+  public getDevicesCount(estbID: number, callback: (result: number | null) => void) {
+    this.getCount(DatabaseTable.DEVICES, estbID, callback);
+  }
+
+  public getDepartmentsCount(callback: (result: number | null) => void) {
+    this.getCount(DatabaseTable.DEPARTMENTS, null, callback);
   }
 
   /**

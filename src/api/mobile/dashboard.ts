@@ -33,7 +33,7 @@ export async function dashboard(request: Request, response: Response) {
     }
 
     // Query the database
-    db.getCount(DatabaseTable.DEVICES, (result) => {
+    db.getDevicesCount(user.establishment_id, (result) => {
       // Data
       const resultData = {
         devices: 0,
@@ -53,7 +53,7 @@ export async function dashboard(request: Request, response: Response) {
       resultData.devices = result;
   
       // Get the fire department count
-      db.getCount(DatabaseTable.DEPARTMENTS, (result) => {
+      db.getDepartmentsCount((result) => {
         // If there is an error
         if (result === null) {
           // Send error
