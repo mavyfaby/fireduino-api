@@ -313,7 +313,7 @@ export class FireduinoDatabase {
    */
   public getFireduinos(estbId: number, callback: (result: [] | null) => void) {
     this.query(
-      "SELECT id AS a, serial_id AS b, estb_id AS c, name AS d, date_stamp AS e FROM devices WHERE estb_id = ?", [estbId], (error, results) => {
+      "SELECT id AS a, mac_address AS b, estb_id AS c, name AS d, date_stamp AS e FROM devices WHERE estb_id = ?", [estbId], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise
@@ -329,14 +329,14 @@ export class FireduinoDatabase {
   }
 
   /**
-   * Get establishment by establishment id and serial id 
+   * Get establishment by establishment id and mac_address
    * @param estbId
-   * @param serialId
+   * @param mac
    * @param callback
    */
-  public getFireduino(estbId: number, serialId: string, callback: (result: boolean | null) => void) {
+  public getFireduino(estbId: number, mac: string, callback: (result: boolean | null) => void) {
     this.query(
-      "SELECT * FROM devices WHERE estb_id = ? AND serial_id = ?", [estbId, serialId], (error, results) => {
+      "SELECT * FROM devices WHERE estb_id = ? AND mac_address = ?", [estbId, mac], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise
@@ -361,13 +361,13 @@ export class FireduinoDatabase {
   /**
    * Add fireduino 
    * @param estbId
-   * @param serialId
+   * @param mac
    * @param name
    * @param callback
    */
-  public addFireduino(estbId: number, serialId: string, name: string, callback: (result: boolean | null) => void) {
+  public addFireduino(estbId: number, mac: string, name: string, callback: (result: boolean | null) => void) {
     this.query(
-      "INSERT INTO devices (serial_id, estb_id, name, date_stamp) VALUES (?, ?, ?, NOW())", [serialId, estbId, name], (error, results) => {
+      "INSERT INTO devices (mac_address, estb_id, name, date_stamp) VALUES (?, ?, ?, NOW())", [mac, estbId, name], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise
