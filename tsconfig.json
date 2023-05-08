@@ -6,7 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "rootDir": "src",
-    "outDir": "dist",
+    "outDir": "api",
     "skipLibCheck": true,
   },
   "include": ["src/**/*"],
