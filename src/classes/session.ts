@@ -1,7 +1,5 @@
-import type { Secret } from 'jsonwebtoken';
 import type { Request, Response } from 'express';
-import { sign, verify } from "jsonwebtoken";
-
+import { SignJWT, jwtVerify } from 'jose';
 import { getPathname } from '../utils';
 
 export class FireduinoSession {
@@ -19,7 +17,7 @@ export class FireduinoSession {
     '/ws/establishments'
   ];
 
-  private secret: Secret;
+  private secret: Uint8Array;
 
   private constructor() {
     // If the JWT secret is not defined
@@ -29,7 +27,7 @@ export class FireduinoSession {
     }
 
     // Set the secret
-    this.secret = process.env.JWT_SECRET;
+    this.secret = new TextEncoder().encode(process.env.JWT_SECRET);
   }
 
   /**
@@ -50,7 +48,7 @@ export class FireduinoSession {
    * Get the middleware for session handling
    */
   public getMiddleware() {
-    return (request: Request, response: Response, next: Function) => {
+    return async (request: Request, response: Response, next: Function) => {
       // Get pathname
       const pathname = getPathname(request.originalUrl);
 
@@ -80,7 +78,7 @@ export class FireduinoSession {
 
         // Verify the token
         try {
-          const data: any = verify(token, this.secret, { algorithms: ["HS256"] });
+          const data: any = await jwtVerify(token, this.secret, { algorithms: ["HS256"]});
           response.locals.uid = data.uid;
         }
         
@@ -100,9 +98,9 @@ export class FireduinoSession {
    * Validate a JWT token if not expired
    * @param token 
    */
-  public validateToken(token: any) {
+  public async validateToken(token: any) {
     try {
-      return verify(token, this.secret, { algorithms: ["HS256"] });
+      return await jwtVerify(token, this.secret, { algorithms: ["HS256"] });
     }
     
     // If the token is invalid
@@ -114,8 +112,15 @@ export class FireduinoSession {
   /**
    * Generate a JWT token
    * @param data
+   * @param expiresIn In minutes
    */
-  public generateToken(data: any, expiresIn?: string) {
-    return sign(data, this.secret, { expiresIn: expiresIn || "10m" });
+  public async generateToken(data: any, expiresIn = 10) {
+    const iat = Math.floor(Date.now() / 1000);
+    const exp = iat + 60 * expiresIn;
+
+    return await new SignJWT({ id: data, exp, iat })
+      .setProtectedHeader({alg: 'HS256', typ: 'JWT'})
+      .setNotBefore(iat)
+      .sign(this.secret);
   }
 }

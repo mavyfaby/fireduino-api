@@ -28,7 +28,7 @@ export async function login(request: Request, response: Response) {
     pass = pass.trim();
 
     // Check if username and password is valid
-    db.checkLoginCredentials(AccountType.ADMIN, user, pass, (userid) => {
+    db.checkLoginCredentials(AccountType.ADMIN, user, pass, async (userid) => {
         // If has error
         if (userid === null) {
             response.status(500).send(data.error("Internal server error!"));
@@ -44,7 +44,7 @@ export async function login(request: Request, response: Response) {
         // Get session instance
         const session = FireduinoSession.getInstance();
         // Generate a JWT token
-        const token = session.generateToken({ uid: userid });
+        const token = await session.generateToken({ uid: userid });
         // Otherwise, return 200
         response.send(data.success("Login successful!", token));
     });

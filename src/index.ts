@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session.getMiddleware());
 
 // Catch all routes
-app.use("*", (request: Request, response: Response) => {
+app.use("*", async (request: Request, response: Response) => {
   // Get pathname
   const pathname = getPathname(request.originalUrl);
 
@@ -68,7 +68,7 @@ app.use("*", (request: Request, response: Response) => {
         // Get session instance
         const session = FireduinoSession.getInstance();
         // Generate new token
-        const token = session.generateToken({ uid: response.locals.uid });
+        const token = await session.generateToken({ uid: response.locals.uid });
         // Reset JWT session expiration
         response.setHeader("Access-Control-Expose-Headers", "Authorization");
         response.setHeader("Authorization", `Bearer ${token}`);
