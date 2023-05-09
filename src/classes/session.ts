@@ -79,7 +79,7 @@ export class FireduinoSession {
         // Verify the token
         try {
           const data: any = await jwtVerify(token, this.secret, { algorithms: ["HS256"]});
-          response.locals.uid = data.uid;
+          response.locals.id = data.payload.id;
         }
         
         // If the token is invalid

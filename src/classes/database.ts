@@ -455,11 +455,11 @@ export class FireduinoDatabase {
    * @param token 
    * @param callback 
    */
-  public getUserByToken(token: string, callback: (result: User | null, errorCode: ErrorCode | null) => void) {
+  public async getUserByToken(token: string, callback: (result: User | null, errorCode: ErrorCode | null) => void) {
     // Get session
     const session = FireduinoSession.getInstance();
     // Get session data
-    const data = session.validateToken(token);
+    const data = await session.validateToken(token);
 
     // If session data is an object
     if (!data || typeof data !== "object") {
@@ -468,10 +468,8 @@ export class FireduinoDatabase {
       return;
     }
 
-    // Convert uid to number
-    const uid = parseInt(data.uid);
     // Get user by id
-    this.getUserById(uid, callback);
+    this.getUserById(data.payload.id as number, callback);
   }
 
   /**
@@ -491,7 +489,7 @@ export class FireduinoDatabase {
       }
 
       // If the invite key is not valid
-      if (establishment.invite_key !== invite_key) {
+      if (establishment.invite_key.toLowerCase() !== invite_key.toLowerCase()) {
         // Reject the promise
         callback(null, ErrorCode.INVITE_KEY);
         return;

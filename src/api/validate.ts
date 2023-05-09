@@ -22,7 +22,7 @@ export async function validate(request: Request, response: Response) {
   // Get session instance
   const session = FireduinoSession.getInstance();
   // Validate token
-  const isValid = session.validateToken(token);
+  const isValid = await session.validateToken(token);
   // Send result
   response.send(isValid ? data.success("Valid token!") : data.error("Invalid token!"));
 }
