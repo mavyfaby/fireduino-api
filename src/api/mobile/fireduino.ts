@@ -24,10 +24,10 @@ export async function fireduino(request: Request, response: Response) {
  */
 function createFireduino(request: Request, response: Response) {
   // Get params
-  let { estbID, serialID, name } = request.body;
+  let { estbID, mac, name } = request.body;
 
   // If there is no token
-  if (!estbID || !serialID || !name) {
+  if (!estbID || !mac || !name) {
     // Send error
     response.status(400).send(data.error("Invalid request!"));
     return;
@@ -35,11 +35,11 @@ function createFireduino(request: Request, response: Response) {
 
   // Trim id's
   estbID = estbID.toString().trim();
-  serialID = serialID.toString().trim();
+  mac = mac.toString().trim();
   name = name.toString().trim();
 
   // Check if the fireduino is already registered
-  isFireduinoRegistered(estbID, serialID, (result) => {
+  isFireduinoRegistered(estbID, mac, (result) => {
     // If there is an error
     if (result === null) {
       // Send error
@@ -58,7 +58,7 @@ function createFireduino(request: Request, response: Response) {
     const db = FireduinoDatabase.getInstance();
 
     // Create the fireduino
-    db.addFireduino(estbID, serialID, name, (result) => {
+    db.addFireduino(estbID, mac, name, (result) => {
       // If there is an error
       if (result === null) {
         // Send error
@@ -77,10 +77,10 @@ function createFireduino(request: Request, response: Response) {
  */
 function getFireduino(request: Request, response: Response) {
   // Get params
-  let { estbID, serialID } = request.body;
+  let { estbID, mac } = request.body;
 
   // If there is no token
-  if (!estbID || !serialID) {
+  if (!estbID || !mac) {
     // Send error
     response.status(400).send(data.error("Invalid request!"));
     return;
@@ -88,13 +88,13 @@ function getFireduino(request: Request, response: Response) {
 
   // Trim id's
   estbID = estbID.toString().trim();
-  serialID = serialID.toString().trim();
+  mac = mac.toString().trim();
 
   // Get database instance
   const db = FireduinoDatabase.getInstance();
 
   // Query the database
-  db.getFireduino(estbID, serialID, (result) => {
+  db.getFireduino(estbID, mac, (result) => {
     if (result === null) {
       // Send error
       response.status(500).send(data.error("System Error [GT_FRD]: Please report this bug!"));
@@ -116,12 +116,12 @@ function getFireduino(request: Request, response: Response) {
 /**
  * Check if the fireduino is already registered
  */ 
-function isFireduinoRegistered(estbId: number, serialID: string, callback: (result: boolean | null) => void) {
+function isFireduinoRegistered(estbId: number, mac: string, callback: (result: boolean | null) => void) {
   // Get database instance
   const db = FireduinoDatabase.getInstance();
 
   // Query the database
-  db.getFireduino(estbId, serialID, (result) => {
+  db.getFireduino(estbId, mac, (result) => {
     if (result === null) {
       // Send error
       callback(null);
