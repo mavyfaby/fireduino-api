@@ -68,7 +68,7 @@ app.use("*", (request: Request, response: Response) => {
         // Get session instance
         const session = FireduinoSession.getInstance();
         // Generate new token
-        const token = session.generateToken({ id: response.locals.uid });
+        const token = session.generateToken({ uid: response.locals.uid });
         // Reset JWT session expiration
         response.setHeader("Access-Control-Expose-Headers", "Authorization");
         response.setHeader("Authorization", `Bearer ${token}`);
