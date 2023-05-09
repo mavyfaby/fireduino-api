@@ -24,7 +24,7 @@ export async function dashboard(request: Request, response: Response) {
   const db = FireduinoDatabase.getInstance();
 
   // Get user data
-  db.getUserById(response.locals.uid, (user) => {
+  db.getUserById(response.locals.id, (user) => {
     // If there is an error
     if (user === null) {
       // Send error
