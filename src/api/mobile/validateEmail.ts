@@ -4,27 +4,30 @@ import { data } from "../../utils";
 import { FireduinoDatabase } from "../../classes/database";
 
 /**
- * Get Establishments 
+ * Validate email 
  * @param request  
  * @param response 
  */
-export async function establishments(request: Request, response: Response) {
+export async function validateEmail(request: Request, response: Response) {
   // Get request params
-  let { search, nameOnly } = request.query;
+  let { email } = request.body;
 
-  // If there is no search param, set to empty string
-  if (!search) search = "";
-  // Set {nameOnly} to boolean
-  const isNameOnly = nameOnly === "1";
+  // If there is no email
+  if (!email) {
+    // Send error
+    response.status(400).send(data.error("Invalid request!"));
+    return;
+  }
+  
   // Get database instance
   const db = FireduinoDatabase.getInstance();
 
   // Query the database
-  db.getEstablishments({ search: search.toString(), isNameOnly, isFromSignUp: true, limit: 10 }, (result) => {
+  db.isEmailTaken(email, (result) => {
     // If there is an error
     if (result === null) {
       // Send error
-      response.status(500).send(data.error("Failed to get establishments!"));
+      response.status(500).send(data.error("System Error: [VLE] Failed to validate email!"));
       return;
     }
 

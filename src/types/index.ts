@@ -74,4 +74,5 @@ export type SearchParams = {
   sortBy?: string;
   sortDirection?: string;
   limit?: number;
+  isFromSignUp?: boolean;
 };

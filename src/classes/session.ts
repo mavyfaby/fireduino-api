@@ -13,6 +13,7 @@ export class FireduinoSession {
     '/mobile/user',
     '/mobile/login',
     '/mobile/validate',
+    '/mobile/validateEmail',
     '/admin/validate',
     '/ws/establishments'
   ];

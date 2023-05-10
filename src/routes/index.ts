@@ -20,6 +20,7 @@ import { establishments as wEstablishments } from '../api/ws';
 
 // Import validation functions
 import { validate } from '../api/validate';
+import { validateEmail } from '../api/mobile/validateEmail';
 
 /**
  * Fireduino API routes
@@ -45,6 +46,7 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/fireduino', methods: ["POST", "GET"], handler: fireduino },
     { path: '/mobile/fireduinos', methods: ["GET"], handler: fireduinos },
     { path: '/mobile/dashboard', methods: ["GET"], handler: dashboard },
+    { path: '/mobile/validateEmail', methods: ["POST"], handler: validateEmail, },
 
     // WebSocket API
     { path: '/ws/establishments', methods: ["GET"], handler: wEstablishments },

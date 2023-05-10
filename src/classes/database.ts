@@ -259,16 +259,26 @@ export class FireduinoDatabase {
    * Get all establishments
    * @param params Search parameters
    * @param callback Callback function
-   */
-  public getEstablishments(params: SearchParams, callback: (result: Establishment[] | null) => void) {
+  */
+ public getEstablishments(params: SearchParams, callback: (result: Establishment[] | null) => void) {
     // Default search column
     let columns = "invite_key AS b, name AS c, phone AS d, address AS e, latitude AS f, longitude AS g, date_stamp AS h";
     let postFix = "ORDER BY date_stamp DESC";
     let where = "";
 
+    
+    // Placeholders
+    const placeholders = [];
+
+    // If has {isFromSignUp}
+    if (params.isFromSignUp) {
+      where += "WHERE id NOT IN (SELECT establishment_id FROM users)";
+    }
+
     // If has {search}
     if (params.search) {
-        where = `WHERE name LIKE '%${params.search}%'`;
+        where += `${params.isFromSignUp ? ' AND' : 'WHERE'} name LIKE ?`;
+        placeholders.push("%" + params.search + "%");
     }
 
     // If {nameOnly}
@@ -292,7 +302,7 @@ export class FireduinoDatabase {
     }
 
     // Query the databaes
-    this.query(`SELECT id AS a, ${columns} FROM establishments ${where} ${postFix}`, [], (error, results) => {
+    this.query(`SELECT id AS a, ${columns} FROM establishments ${where} ${postFix}`, placeholders, (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
@@ -389,6 +399,31 @@ export class FireduinoDatabase {
    */
   public isUsernameTaken(username: string, callback: (result: boolean | null) => void) {
     this.query("SELECT id FROM users WHERE username = ?", [username], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // If there is no result
+      if (results.length === 0) {
+        // Reject the promise
+        callback(false);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(true);
+    });
+  }
+
+  /**
+   * Check if email is taken
+   */
+  public isEmailTaken(email: string, callback: (result: boolean | null) => void) {
+    this.query("SELECT id FROM users WHERE email = ?", [email], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
