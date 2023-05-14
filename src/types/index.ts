@@ -26,7 +26,15 @@ export enum ErrorCode {
   ACCOUNT_CREATE,
   USERNAME_TAKEN,
   USER_NOT_FOUND,
+  PASSWORD_UPDATE,
+  USERNAME_UPDATE,
+  PASSWORD_LENGTH,
   INVALID_TOKEN
+}
+
+export enum EditUserType {
+  USERNAME = 1,
+  PASSWORD = 2,
 }
 
 export enum AccountType {

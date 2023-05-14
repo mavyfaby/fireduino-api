@@ -1,5 +1,5 @@
 import {
-  AccountType, CreateUserData, DatabaseTable, ErrorCode,
+  AccountType, CreateUserData, DatabaseTable, EditUserType, ErrorCode,
   Establishment, FireDepartment, SearchParams, User
 } from "../types";
 
@@ -628,6 +628,82 @@ export class FireduinoDatabase {
 
       // Otherwise, resolve the promise
       callback(Object.values(results[0]));
+    });
+  }
+
+  /**
+   * Update user
+   */
+  public updateUser(token: string, type: EditUserType, data: string, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // If the type is password
+      if (type === EditUserType.PASSWORD) {
+        // If password is less empty
+        if (data.length < 8) {
+          // Reject the promise
+          callback(null, ErrorCode.PASSWORD_LENGTH);
+          return;
+        }
+
+        // Hash the password
+        bcrypt.hash(data, 10, (error, hash) => {
+          // If there is an error
+          if (error) {
+            // Reject the promise
+            console.error(error);
+            callback(null, ErrorCode.PASSWORD_HASH);
+            return;
+          }
+    
+          // Otherwise, update the password
+          this.query("UPDATE users SET password = ? WHERE id = ?", [hash, user.id], (error) => {
+            // If there is an error
+            if (error) {
+              // Reject the promise
+              console.error(error);
+              callback(null, ErrorCode.PASSWORD_UPDATE);
+              return;
+            }
+    
+            // Otherwise, resolve the promise
+            callback(0, null);
+          });
+        });
+  
+        return;
+      }
+  
+      // Check if the username is taken
+      this.isUsernameTaken(data, (isTaken) => {
+        // IF username taken
+        if (isTaken) {
+          // Reject the promise
+          callback(null, ErrorCode.USERNAME_TAKEN);
+          return;
+        }
+  
+        // Otherwise, update the data
+        this.query("UPDATE users SET username = ? WHERE id = ?", [data, user.id], (error) => {
+          // If there is an error
+          if (error) {
+            // Reject the promise
+            console.error(error);
+            callback(null, ErrorCode.USERNAME_UPDATE);
+            return;
+          }
+  
+          // Otherwise, resolve the promise
+          callback(0, null);
+        });
+      });
     });
   }
 }

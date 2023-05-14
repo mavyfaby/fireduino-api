@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import { data } from "../../utils";
 import { FireduinoDatabase } from "../../classes/database";
-import { ErrorCode } from "../../types";
+import { EditUserType, ErrorCode } from "../../types";
 
 /**
  * Account Management API
@@ -10,10 +10,16 @@ import { ErrorCode } from "../../types";
  * @param response 
  */
 export async function user(request: Request, response: Response) {
-  // Get request method
+  // If the request method is POST
   if (request.method === "POST") {
     // Create an account
     return createAccount(request, response);
+  }
+
+  // If the request method is PUT
+  if (request.method === "PUT") {
+    // Update an account
+    return updateAccount(request, response);
   }
 
   // Otherwise, get the user's account
@@ -142,5 +148,67 @@ function createAccount(request: Request, response: Response) {
 
     // Send data
     response.send(data.success("Success!", "You have successfully created an account!"));
+  });
+}
+
+/**
+ * Update an account
+ * @param request 
+ * @param response 
+ * @returns 
+ */
+function updateAccount(request: Request, response: Response) {
+  // Get request params
+  let { token, type, value } = request.body;
+
+  // If there is one or more missing params
+  if (!token || !type || !value) {
+    // Send error
+    response.status(400).send(data.error("Invalid request!"));
+    return;
+  }
+
+  // If the type is 1
+  type = type == 1 ? EditUserType.USERNAME : EditUserType.PASSWORD;
+  // Get database instance
+  const db = FireduinoDatabase.getInstance();
+
+  // Query the database
+  db.updateUser(token, type, value, (result, errorCode) => {
+    // If there is an error
+    if (result === null) {
+      // Declare default message 
+      let message = "Something went wrong!";
+
+      switch (errorCode) {
+        case ErrorCode.USERNAME_TAKEN:
+          message = "The username you entered is already taken!";
+          break;
+        case ErrorCode.PASSWORD_HASH:
+          message = "System error [PSS_HSH]: Please report this bug!";
+          break;
+        case ErrorCode.PASSWORD_LENGTH:
+          message = "Password must be at least 8 characters long!";
+          break;
+        case ErrorCode.PASSWORD_UPDATE:
+          message = "System error [PSS_UPT]: Please report this bug!";
+          break;
+        case ErrorCode.USERNAME_UPDATE:
+          message = "System error [USR_UPT]: Please report this bug!";
+          break;
+        case ErrorCode.SYSTEM_ERROR:
+          message = "System error [SYS]: Please report this bug!";
+          break;
+      }
+
+      // Send error
+      response.status(400).send(data.error(message));
+      return;
+    }
+
+    // Send data
+    response.send(data.success("Success!",  (
+      type == EditUserType.USERNAME ? "Username" : "Password") + " updated successfully!"
+    ));
   });
 }
