@@ -733,7 +733,7 @@ export class FireduinoDatabase {
       }
 
       // Otherwise, get the login history
-      this.query("SELECT date_stamp FROM login_history WHERE user_id = ?", [user.id], (error, results) => {
+      this.query("SELECT date_stamp FROM login_history WHERE user_id = ? ORDER BY date_stamp DESC", [user.id], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise
@@ -762,7 +762,7 @@ export class FireduinoDatabase {
       }
 
       // Otherwise, get the login history
-      this.query("SELECT d.name, d.mac_address, a.date_stamp FROM access_logs a INNER JOIN devices d ON d.id = a.device_id WHERE user_id = ?", [user.id], (error, results) => {
+      this.query("SELECT d.name, d.mac_address, a.date_stamp FROM access_logs a INNER JOIN devices d ON d.id = a.device_id WHERE user_id = ? ORDER BY a.date_stamp DESC", [user.id], (error, results) => {
         // If there is an error
         if (error) {
           // Reject the promise
