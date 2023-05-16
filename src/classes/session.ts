@@ -88,6 +88,9 @@ export class FireduinoSession {
           response.locals.isUnauthorized = true;
         }
 
+        // Put token in response
+        response.locals.token = token;
+
         return next();
       }
 

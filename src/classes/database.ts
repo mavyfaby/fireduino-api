@@ -97,8 +97,18 @@ export class FireduinoDatabase {
             createdAt: results[0].date_stamp,
           };
 
-          // Resolve the promise
-          callback(user);
+          // Log the user login in the database
+          this.query("INSERT INTO login_history (user_id, date_stamp) VALUES (?, NOW())", [user.id], (error) => {
+            // If there is an error
+            if (error) {
+              // Just log the error
+              console.error("Failed to log user login!");
+            }
+
+            // Resolve the promise
+            callback(user);
+          });
+          
           return;
         }
 
@@ -703,6 +713,37 @@ export class FireduinoDatabase {
           // Otherwise, resolve the promise
           callback(0, null);
         });
+      });
+    });
+  }
+
+  /**
+   * Get login history
+   * @param token 
+   * @param callback 
+   */
+  public getLoginHistory(token: string, callback: (result: string[] | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Otherwise, get the login history
+      this.query("SELECT * FROM login_history WHERE user_id = ?", [user.id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.LOGIN_HISTORY);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(results, null);
       });
     });
   }

@@ -5,4 +5,5 @@ export * from "./fireduino";
 export * from "./fireduinos";
 export * from "./user";
 export * from "./login";
+export * from "./history";
 export * from "./verify";

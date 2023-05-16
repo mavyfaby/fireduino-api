@@ -12,7 +12,7 @@ import {
 import {
     login as loginMobile,
     establishments as mEstablishments,
-    departments as mDepartments,
+    departments as mDepartments, history,
     verify, user, fireduino, fireduinos, dashboard
 } from '../api/mobile';
 
@@ -45,6 +45,7 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/validate', methods: ["POST"], handler: validate, },
     { path: '/mobile/fireduino', methods: ["POST", "GET"], handler: fireduino },
     { path: '/mobile/fireduinos', methods: ["GET"], handler: fireduinos },
+    { path: '/mobile/history', methods: ["GET"], handler: history },
     { path: '/mobile/dashboard', methods: ["GET"], handler: dashboard },
     { path: '/mobile/validateEmail', methods: ["POST"], handler: validateEmail, },
 
