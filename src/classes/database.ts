@@ -747,4 +747,33 @@ export class FireduinoDatabase {
       });
     });
   }
+
+  /**
+   * Get access logs
+   */
+  public getAccessLogs(token: string, callback: (result: string[] | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Otherwise, get the login history
+      this.query("SELECT d.name, d.mac_address, a.date_stamp FROM access_logs a INNER JOIN devices d ON d.id = a.device_id WHERE user_id = ?", [user.id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.ACCESS_LOGS);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(results, null);
+      });
+    });
+  }
 }

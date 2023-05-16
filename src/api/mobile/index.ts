@@ -3,6 +3,7 @@ export * from "./departments";
 export * from "./dashboard";
 export * from "./fireduino";
 export * from "./fireduinos";
+export * from "./access_logs";
 export * from "./user";
 export * from "./login";
 export * from "./history";
