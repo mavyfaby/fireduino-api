@@ -4,6 +4,7 @@ export * from "./dashboard";
 export * from "./fireduino";
 export * from "./fireduinos";
 export * from "./access_logs";
+export * from "./access";
 export * from "./user";
 export * from "./login";
 export * from "./history";

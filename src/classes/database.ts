@@ -776,4 +776,33 @@ export class FireduinoDatabase {
       });
     });
   }
+
+  /**
+   * Add device access log
+   */
+  public addAccessLog(token: string, deviceID: number, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Otherwise, add the access log
+      this.query("INSERT INTO access_logs (user_id, device_id, date_stamp) VALUES (?, ?, NOW())", [user.id, deviceID], (error) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.ACCESS_LOG_ADD);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(0, null);
+      });
+    });
+  }
 }

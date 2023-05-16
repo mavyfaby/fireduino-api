@@ -14,7 +14,7 @@ import {
     establishments as mEstablishments,
     departments as mDepartments,
     history, verify, user, fireduino, fireduinos, dashboard,
-    accessLogs
+    accessLogs, accessDevice
 } from '../api/mobile';
 
 import { establishments as wEstablishments } from '../api/ws';
@@ -50,6 +50,7 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/dashboard', methods: ["GET"], handler: dashboard },
     { path: '/mobile/validateEmail', methods: ["POST"], handler: validateEmail },
     { path: '/mobile/accesslogs', methods: ["GET"], handler: accessLogs },
+    { path: '/mobile/access', methods: ["POST"], handler: accessDevice },
 
     // WebSocket API
     { path: '/ws/establishments', methods: ["GET"], handler: wEstablishments },
