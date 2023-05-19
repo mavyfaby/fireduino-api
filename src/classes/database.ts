@@ -403,6 +403,44 @@ export class FireduinoDatabase {
   }
 
   /**
+   * Edit fireduino
+   */
+  public editFireduino(estbId: number, mac: string, name: string, callback: (result: boolean | null, errorCode: ErrorCode | null) => void) {
+    // Check if name is taken
+    this.isFireduinoNameTaken(estbId, name, (isTaken) => {
+      // If isTake is null
+      if (isTaken === null) {
+        // Reject the promise
+        callback(null, ErrorCode.DEVICE_NOT_FOUND);
+        return;
+      }
+
+      // If name is taken
+      if (isTaken) {
+        // Reject the promise
+        callback(null, ErrorCode.NAME_TAKEN);
+        return;
+      }
+      
+      // Otherwise, update the name
+      this.query(
+        "UPDATE devices SET name = ? WHERE estb_id = ? AND mac_address = ?", [name, estbId, mac], (error, results) => {
+          // If there is an error
+          if (error) {
+            // Reject the promise
+            console.error(error);
+            callback(null, ErrorCode.SYSTEM_ERROR);
+            return;
+          }
+  
+          // Otherwise, resolve the promise
+          callback(true, null);
+        }
+      );
+    });
+  }
+
+  /**
    * Check if username is taken
    * @param username
    * @param callback
@@ -434,6 +472,31 @@ export class FireduinoDatabase {
    */
   public isEmailTaken(email: string, callback: (result: boolean | null) => void) {
     this.query("SELECT id FROM users WHERE email = ?", [email], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // If there is no result
+      if (results.length === 0) {
+        // Reject the promise
+        callback(false);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(true);
+    });
+  }
+
+  /**
+   * Check if fireudino name is taken
+   */
+  public isFireduinoNameTaken(estbID: number, name: string, callback: (result: boolean | null) => void) {
+    this.query("SELECT id FROM devices WHERE estb_id = ? AND name = ?", [estbID, name], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise

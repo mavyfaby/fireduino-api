@@ -44,7 +44,7 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/user', methods: ["GET", "POST", "PUT"], handler: user, },
     { path: '/mobile/login', methods: ["POST"], handler: loginMobile, },
     { path: '/mobile/validate', methods: ["POST"], handler: validate, },
-    { path: '/mobile/fireduino', methods: ["POST", "GET"], handler: fireduino },
+    { path: '/mobile/fireduino', methods: ["POST", "PUT", "GET"], handler: fireduino },
     { path: '/mobile/fireduinos', methods: ["GET"], handler: fireduinos },
     { path: '/mobile/history', methods: ["GET"], handler: history },
     { path: '/mobile/dashboard', methods: ["GET"], handler: dashboard },

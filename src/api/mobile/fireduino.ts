@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import { data } from "../../utils";
 import { FireduinoDatabase } from "../../classes/database";
+import { ErrorCode } from "../../types";
 
 /**
  * Fireduino Management API
@@ -9,10 +10,16 @@ import { FireduinoDatabase } from "../../classes/database";
  * @param response 
  */
 export async function fireduino(request: Request, response: Response) {
-  // Get request method
+  // If POST request
   if (request.method === "POST") {
     // Create a fireduino
     return createFireduino(request, response);
+  }
+
+  // If PUT request
+  if (request.method === "PUT") {
+    // Edit a fireduino
+    return editFireduino(request, response);
   }
 
   // Otherwise, get the fireduino's data
@@ -68,6 +75,75 @@ function createFireduino(request: Request, response: Response) {
 
       // Otherwise, send the fireduino's data
       response.send(data.success(result));
+    });
+  });
+}
+
+/**
+ * Edit fireduino
+ */
+function editFireduino(request: Request, response: Response) {
+  // Get name param
+  let { estbID, mac, deviceID, name } = request.body;
+
+  // If one of the params is not defined
+  if (!estbID || !mac || !deviceID || !name) {
+    // Send error
+    response.status(400).send(data.error("Invalid request!"));
+    return;
+  }
+
+  // Trim inputs
+  estbID = estbID.toString().trim();
+  deviceID = deviceID.toString().trim();
+  mac = mac.toString().trim();
+  name = name.toString().trim();
+
+  // Check if the fireduino is already registered
+  isFireduinoRegistered(estbID, mac, (result) => {
+    // If there is an error
+    if (result === null) {
+      // Send error
+      response.status(400).send(data.error("System Error [CHK_FRD]: Please report this bug!"));
+      return;
+    }
+
+    // If the fireduino is not found
+    if (!result) {
+      // Send error
+      response.status(400).send(data.error("The fireduino doesn't exist!"));
+      return;
+    }
+
+    // Otherwise, get database instance
+    const db = FireduinoDatabase.getInstance();
+
+    // Edit fireduino device
+    // Create the fireduino
+    db.editFireduino(estbID, mac, name, (result, errorCode) => {
+      // If there is an error
+      if (result === null) {
+        let message = "System Error [EDT_FRD]: Please report this bug!";
+
+        switch (errorCode) {
+          case ErrorCode.DEVICE_NOT_FOUND:
+            message = "The fireduino doesn't exist!";
+            break;
+          case ErrorCode.SYSTEM_ERROR:
+            message = "System Error [EDT_FRD]: Please report this bug!";
+            break;
+          case ErrorCode.NAME_TAKEN:
+            message = "The name is already taken!";
+            break;
+        }
+
+        // Send error
+        response.status(500).send(data.error(message));
+        return;
+      }
+
+      // Otherwise, send the fireduino's data
+      response.send(data.success("Name has been edited successfully!"));
     });
   });
 }
