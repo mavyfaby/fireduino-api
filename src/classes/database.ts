@@ -1,6 +1,6 @@
 import {
   AccountType, CreateUserData, DatabaseTable, EditUserType, ErrorCode,
-  Establishment, FireDepartment, SearchParams, User
+  Establishment, FireDepartment, IncidentReport, SearchParams, User
 } from "../types";
 
 import mysql from "mysql";
@@ -24,6 +24,7 @@ export class FireduinoDatabase {
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
+      dateStrings: true
     });
   }
 
@@ -863,6 +864,109 @@ export class FireduinoDatabase {
           return;
         }
 
+        // Otherwise, resolve the promise
+        callback(0, null);
+      });
+    });
+  }
+
+  /**
+   * Get incident reports 
+   */
+  public getReports(token: string, callback: (result: IncidentReport[] | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // Query for the reports (only ids)
+      // SELECT i.id AS iid, r.id AS rid, i.dept_id, i.sms_id, i.device_id, r.user_id, r.cause, i.date_stamp AS i_date, r.date_stamp AS r_date FROM incidents i
+      // LEFT JOIN reports r ON r.incident_id = i.id WHERE estb_id = 3 ORDER BY i.date_stamp DESC;
+
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Get the reports
+      this.query(`
+        SELECT i.id AS iid, r.id AS rid, fd.name AS dept_name, i.sms_id, d.name AS device_name,
+          CONCAT(u.firstname, u.lastname) AS user_name, r.cause, i.date_stamp AS idate, r.date_stamp AS rdate
+        FROM incidents i
+          LEFT JOIN reports r ON r.incident_id = i.id
+          LEFT JOIN fire_departments fd ON fd.id = i.dept_id
+          LEFT JOIN devices d ON d.id = i.device_id
+          LEFT JOIN users u ON u.id = r.user_id
+        WHERE i.estb_id = ?
+        ORDER BY i.date_stamp DESC
+      `, [user?.establishment_id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.REPORTS);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        const reports: IncidentReport[] = results;
+        // Otherwise, resolve the promise
+        callback(reports, null);
+      });
+    });
+  }
+
+  /**
+   * Create a report
+   */
+  public createReport(token: string, incidentID: number, report: string, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Add the report
+      this.query("INSERT INTO reports (incident_id, user_id, cause, date_stamp) VALUES (?, ?, ?, NOW())", [incidentID, user!.id, report], (error) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.CREATE_REPORT);
+          return;
+        }
+  
+        // Otherwise, resolve the promise
+        callback(0, null);
+      });
+    });
+  }
+
+  /**
+   * Edit a report
+   */
+  public editReport(token: string, reportID: number, report: string, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Add the report
+      this.query("UPDATE reports SET cause = ?, date_stamp = NOW() WHERE id = ? AND user_id = ?", [report, reportID, user!.id], (error) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.EDIT_REPORT);
+          return;
+        }
+  
         // Otherwise, resolve the promise
         callback(0, null);
       });

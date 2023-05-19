@@ -5,6 +5,8 @@ export * from "./fireduino";
 export * from "./fireduinos";
 export * from "./access_logs";
 export * from "./access";
+export * from "./report";
+export * from "./reports";
 export * from "./user";
 export * from "./login";
 export * from "./history";

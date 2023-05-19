@@ -31,8 +31,11 @@ export enum ErrorCode {
   USERNAME_UPDATE,
   PASSWORD_LENGTH,
   ACCESS_LOGS,
+  REPORTS,
   NAME_TAKEN,
   ACCESS_LOG_ADD,
+  CREATE_REPORT,
+  EDIT_REPORT,
   LOGIN_HISTORY,
   INVALID_TOKEN
 }
@@ -79,6 +82,18 @@ export type Establishment = {
   latitude: string;
   longitude: string;
   invite_key: string;
+}
+
+export type IncidentReport = {
+  iid: number;
+  rid: number;
+  dept_name: string;
+  sms_id: number;
+  device_name: string;
+  user_name: string;
+  cause: string;
+  idate: string;
+  rdate: string;
 }
 
 export type SearchParams = {
