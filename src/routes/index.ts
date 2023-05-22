@@ -12,8 +12,8 @@ import {
 import {
     login as loginMobile,
     establishments as mEstablishments,
-    departments as mDepartments,
-    history, verify, user, fireduino, fireduinos, dashboard,
+    departments as mDepartments, edit_history,
+    login_history, verify, user, fireduino, fireduinos, dashboard,
     accessLogs, accessDevice, incidentReports, incidentReport
 } from '../api/mobile';
 
@@ -46,7 +46,8 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/validate', methods: ["POST"], handler: validate, },
     { path: '/mobile/fireduino', methods: ["POST", "PUT", "GET"], handler: fireduino },
     { path: '/mobile/fireduinos', methods: ["GET"], handler: fireduinos },
-    { path: '/mobile/history', methods: ["GET"], handler: history },
+    { path: '/mobile/loginhistory', methods: ["GET"], handler: login_history },
+    { path: '/mobile/edithistory', methods: ["GET"], handler: edit_history },
     { path: '/mobile/dashboard', methods: ["GET"], handler: dashboard },
     { path: '/mobile/validateEmail', methods: ["POST"], handler: validateEmail },
     { path: '/mobile/accesslogs', methods: ["GET"], handler: accessLogs },

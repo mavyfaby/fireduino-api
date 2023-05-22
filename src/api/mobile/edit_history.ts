@@ -4,20 +4,20 @@ import { data } from "../../utils";
 import { FireduinoDatabase } from "../../classes/database";
 
 /**
- * History logs
+ * Fetch edit logs
  * @param request  
  * @param response 
  */
-export async function history(request: Request, response: Response) {
+export async function edit_history(request: Request, response: Response) {
   // Get database instance
   const db = FireduinoDatabase.getInstance();
   
   // Query the database
-  db.getLoginHistory(response.locals.token, (result) => {
+  db.getEditHistory(response.locals.token, (result) => {
     // If there is an error
     if (result === null) {
       // Send error
-      response.status(500).send(data.error("Failed to get login history!"));
+      response.status(500).send(data.error("Failed to get edit history!"));
       return;
     }
 

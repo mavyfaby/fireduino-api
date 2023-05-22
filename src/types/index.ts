@@ -35,6 +35,7 @@ export enum ErrorCode {
   NAME_TAKEN,
   ACCESS_LOG_ADD,
   CREATE_REPORT,
+  EDIT_HISTORY,
   EDIT_REPORT,
   LOGIN_HISTORY,
   INVALID_TOKEN
@@ -104,3 +105,9 @@ export type SearchParams = {
   limit?: number;
   isFromSignUp?: boolean;
 };
+
+export type EditHistory = {
+  name: string;
+  before: string;
+  after: string;
+}

@@ -9,5 +9,6 @@ export * from "./report";
 export * from "./reports";
 export * from "./user";
 export * from "./login";
-export * from "./history";
 export * from "./verify";
+export * from "./edit_history";
+export * from "./login_history";

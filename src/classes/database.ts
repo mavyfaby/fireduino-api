@@ -1,6 +1,7 @@
 import {
   AccountType, CreateUserData, DatabaseTable, EditUserType, ErrorCode,
-  Establishment, FireDepartment, IncidentReport, SearchParams, User
+  Establishment, FireDepartment, IncidentReport, SearchParams, User,
+  EditHistory
 } from "../types";
 
 import mysql from "mysql";
@@ -969,6 +970,39 @@ export class FireduinoDatabase {
   
         // Otherwise, resolve the promise
         callback(0, null);
+      });
+    });
+  }
+
+  /**
+   * Get edit history
+   */
+  public getEditHistory(token: string, callback: (result: EditHistory[] | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Get the edit history
+      this.query(`
+        SELECT t.name, e.before, e.after, e.date_stamp FROM edit_history e
+          INNER JOIN edit_types t ON e.edit_type_id = t.id 
+        WHERE user_id = ? ORDER BY date_stamp DESC
+      `, [user.id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.EDIT_HISTORY);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(results, null);
       });
     });
   }
