@@ -33,6 +33,7 @@ export enum ErrorCode {
   ACCESS_LOGS,
   REPORTS,
   NAME_TAKEN,
+  ADD_EDIT_HISTORY,
   ACCESS_LOG_ADD,
   CREATE_REPORT,
   EDIT_HISTORY,
@@ -110,4 +111,8 @@ export type EditHistory = {
   name: string;
   before: string;
   after: string;
+}
+
+export enum EditType {
+  FIREDUINO = 1,
 }

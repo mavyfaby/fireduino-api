@@ -1,7 +1,7 @@
 import {
   AccountType, CreateUserData, DatabaseTable, EditUserType, ErrorCode,
   Establishment, FireDepartment, IncidentReport, SearchParams, User,
-  EditHistory
+  EditHistory, EditType
 } from "../types";
 
 import mysql from "mysql";
@@ -407,7 +407,7 @@ export class FireduinoDatabase {
   /**
    * Edit fireduino
    */
-  public editFireduino(estbId: number, mac: string, name: string, callback: (result: boolean | null, errorCode: ErrorCode | null) => void) {
+  public editFireduino(token: string, estbId: number, mac: string, name: string, callback: (result: boolean | null, errorCode: ErrorCode | null) => void) {
     // Check if name is taken
     this.isFireduinoNameTaken(estbId, name, (isTaken) => {
       // If isTake is null
@@ -423,22 +423,41 @@ export class FireduinoDatabase {
         callback(null, ErrorCode.NAME_TAKEN);
         return;
       }
-      
-      // Otherwise, update the name
-      this.query(
-        "UPDATE devices SET name = ? WHERE estb_id = ? AND mac_address = ?", [name, estbId, mac], (error, results) => {
-          // If there is an error
-          if (error) {
-            // Reject the promise
-            console.error(error);
-            callback(null, ErrorCode.SYSTEM_ERROR);
-            return;
-          }
-  
-          // Otherwise, resolve the promise
-          callback(true, null);
+
+      // Get current name
+      this.getColumnByTableWhere("devices", "name", "mac_address", mac, currentName => {
+        // If there is an error
+        if (currentName === null) {
+          // Reject the promise
+          callback(null, ErrorCode.SYSTEM_ERROR);
+          return;
         }
-      );
+        
+        // Otherwise, update the name
+        this.query(
+          "UPDATE devices SET name = ? WHERE estb_id = ? AND mac_address = ?", [name, estbId, mac], (error, results) => {
+            // If there is an error
+            if (error) {
+              // Reject the promise
+              console.error(error);
+              callback(null, ErrorCode.SYSTEM_ERROR);
+              return;
+            }
+  
+            // Record the edit history
+            this.recordEditHistory(token, EditType.FIREDUINO, currentName, name, (result, errorCode) => {
+              // If there is an error
+              if (result === null) {
+                // Just log the error
+                console.log("Failed to record edit history: " + errorCode);
+              }
+
+              // Otherwise, resolve the promise
+              callback(true, null);
+            });
+          }
+        );
+      });
     });
   }
 
@@ -1004,6 +1023,60 @@ export class FireduinoDatabase {
         // Otherwise, resolve the promise
         callback(results, null);
       });
+    });
+  }
+
+  /**
+   * Record edit history
+   */
+  public recordEditHistory(token: string, editType: EditType, before: string, after: string, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Add the history
+      this.query("INSERT INTO edit_history (user_id, edit_type_id, `before`, `after`, date_stamp) VALUES (?, ?, ?, ?, NOW())", [user.id, editType, before, after], (error) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.ADD_EDIT_HISTORY);
+          return;
+        }
+  
+        // Otherwise, resolve the promise
+        callback(0, null);
+      });
+    });
+  }
+
+  /**
+   * Get column by table where
+   */
+  public getColumnByTableWhere(table: string, column: string, columnWhere: string, columnValue: string, callback: (result: string | null) => void) {
+    this.query(`SELECT ${column} FROM ${table} WHERE ${columnWhere} = ?`, [columnValue], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // If there is no result
+      if (results.length === 0) {
+        // Reject the promise
+        callback(null);
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(results[0][column]);
     });
   }
 }

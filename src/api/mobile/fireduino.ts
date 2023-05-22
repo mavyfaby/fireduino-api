@@ -120,7 +120,7 @@ function editFireduino(request: Request, response: Response) {
 
     // Edit fireduino device
     // Create the fireduino
-    db.editFireduino(estbID, mac, name, (result, errorCode) => {
+    db.editFireduino(response.locals.token, estbID, mac, name, (result, errorCode) => {
       // If there is an error
       if (result === null) {
         let message = "System Error [EDT_FRD]: Please report this bug!";
