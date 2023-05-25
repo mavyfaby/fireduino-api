@@ -74,6 +74,9 @@ export type FireDepartment = {
   address: string;
   latitude: string;
   longitude: string;
+  distance?: number;
+  duration?: number;
+  date?: string;
 };
 
 export type Establishment = {

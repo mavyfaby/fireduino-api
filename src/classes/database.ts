@@ -7,6 +7,8 @@ import {
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import { FireduinoSession } from "./session";
+import LatLng from "../models/latlng";
+import { getDistance } from "../utils/maps";
 
 /**
  * Singleton class for fireduino database
@@ -172,13 +174,44 @@ export class FireduinoDatabase {
    * Get all fire departments
    * @param callback Callback function
    */
-  public getFireDepartments(callback: (result: FireDepartment[] | null) => void) {
-    this.query("SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f, date_stamp AS g FROM fire_departments", [], (error, results) => {
+  public getFireDepartments(location: string | undefined, search: string | undefined, callback: (result: FireDepartment[] | null) => void) {
+    let query = "SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f, date_stamp AS g FROM fire_departments";
+    let params = [];
+
+    // If has search
+    if (typeof search === "string" && search.trim().length > 0) {
+      query += " WHERE name LIKE ?";
+      params.push("%" + search.trim() + "%");
+    }
+
+    this.query(query, params, (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
         console.error(error);
         callback(null);
+        return;
+      }
+
+      // If there's location
+      if (location != null) {
+        // Split
+        const spl = location.split(",");
+        // Origin
+        const origin = new LatLng(Number(spl[0]), Number(spl[1]));
+  
+        // Get distance and duration
+        getDistance(origin, results.map((dep: any) => new LatLng(Number(dep.e), Number(dep.f))), (distance) => {
+          // Loop through the results
+          for (let i = 0; i < results.length; i++) {
+            results[i].distance = distance[i].distance;
+            results[i].duration = distance[i].duration;
+          }
+
+          // Otherwise, resolve the promise
+          callback(results);
+        });
+
         return;
       }
 

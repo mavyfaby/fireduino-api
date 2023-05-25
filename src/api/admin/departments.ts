@@ -13,7 +13,7 @@ export async function departments(request: Request, response: Response) {
   const db = FireduinoDatabase.getInstance();
   
   // Query the database
-  db.getFireDepartments((result) => {
+  db.getFireDepartments(undefined, undefined, (result) => {
     // If there is an error
     if (result === null) {
       // Send error
