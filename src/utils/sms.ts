@@ -17,5 +17,17 @@ const twilio = new Twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
  */
 export function sendSMS(to: string, message: string) {
   // Send SMS
-  twilio.messages.create({ from: process.env.TWILIO_NUMBER, to, body: message });
+  twilio.messages.create({ from: process.env.TWILIO_NUMBER, to: toUniversal(to), body: message });
+}
+
+/**
+ * Convert a number to universal format
+ */
+function toUniversal(number: string) {
+  // Remove all spaces
+  number = number.replace(/\s/g, '');
+  // Check if number is valid
+  if (number[0] === '+') return number;
+  if (number[0] === '0') return '+63' + number.substring(1);
+  return '+63' + number;
 }
