@@ -1,6 +1,6 @@
 {
   "name": "fireduino-api",
-  "version": "1.0.0-pre.55",
+  "version": "1.0.0-pre.56",
   "description": "Official Fireduino API",
   "main": "dist/index.js",
   "scripts": {
@@ -30,7 +30,8 @@
     "helmet": "^7.0.0",
     "jose": "^4.14.4",
     "mysql": "^2.18.1",
-    "socket.io-client": "^4.6.1"
+    "socket.io-client": "^4.6.1",
+    "twilio": "^4.11.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

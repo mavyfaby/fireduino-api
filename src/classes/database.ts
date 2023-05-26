@@ -1096,7 +1096,7 @@ export class FireduinoDatabase {
       }
 
       // Send the SMS synchronously
-      sendSMS(estb.phone, dept.phone, template);
+      sendSMS(dept.phone, template);
 
       // Add the SMS to the database
       this.query("INSERT INTO sms_history (dept_id, date_stamp) VALUES (?, NOW())", [dept.id], (error, results) => {
