@@ -12,6 +12,7 @@ import { handleNotFound, handleUnimplemented, handleUnauthorized } from "./route
 import { getPathname, isApiExist } from "./utils";
 import { FireduinoDatabase } from "./classes/database";
 import { FireduinoSession } from "./classes/session";
+import { FireduinoSocketClient } from "./classes/socket";
 
 // Load environment variables
 dotenv.config();
@@ -64,7 +65,7 @@ app.use("*", async (request: Request, response: Response) => {
       }
       
       // If the request is authorized
-      if (response.locals.needsAuth) {;
+      if (response.locals.needsAuth) {
         // Get session instance
         const session = FireduinoSession.getInstance();
         // Generate new token
@@ -85,6 +86,8 @@ app.use("*", async (request: Request, response: Response) => {
 app.listen(port, () => {
   // Initialize database
   FireduinoDatabase.getInstance();
+  // Connect to socket server
+  FireduinoSocketClient.getInstance();
   // Log test
   console.log(`Fireduino API is listening on port ${port}`);
 });

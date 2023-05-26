@@ -8,21 +8,22 @@ import mysql from "mysql";
 import bcrypt from "bcrypt";
 import { FireduinoSession } from "./session";
 import LatLng from "../models/latlng";
-import { getDistance } from "../utils/maps";
+import { getDistance, getNearestFireDepartment } from "../utils/maps";
+import { sendSMS } from "../utils/sms";
 
 /**
  * Singleton class for fireduino database
  */
 export class FireduinoDatabase {
   private static instance: FireduinoDatabase;
-  private static pool: mysql.Pool;
+  private static pool: mysql.Connection;
 
   /**
    * Create a database connection pool
    */
   private constructor() {
     // Create a database connection pool
-    FireduinoDatabase.pool = mysql.createPool({
+    FireduinoDatabase.pool = mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
@@ -174,7 +175,7 @@ export class FireduinoDatabase {
    * Get all fire departments
    * @param callback Callback function
    */
-  public getFireDepartments(location: string | undefined, search: string | undefined, callback: (result: FireDepartment[] | null) => void) {
+  public getFireDepartments(location: string | undefined, search: string | undefined, callback: (result: any[] | null) => void) {
     let query = "SELECT id AS a, name AS b, phone AS c, address AS d, latitude AS e, longitude AS f, date_stamp AS g FROM fire_departments";
     let params = [];
 
@@ -389,7 +390,7 @@ export class FireduinoDatabase {
    * @param mac
    * @param callback
    */
-  public getFireduino(estbId: number, mac: string, callback: (result: boolean | null) => void) {
+  public getFireduino(estbId: number, mac: string, callback: (result: any) => void) {
     this.query(
       "SELECT * FROM devices WHERE estb_id = ? AND mac_address = ?", [estbId, mac], (error, results) => {
         // If there is an error
@@ -1023,6 +1024,119 @@ export class FireduinoDatabase {
         // Otherwise, resolve the promise
         callback(0, null);
       });
+    });
+  }
+
+  /**
+   * Create an incident
+   */
+  public createIncident(estbID: number, mac: string, callback: (result: number | null, errorCode: ErrorCode | null) => void) {
+    // Get fireduino
+    this.getFireduino(estbID, mac, (fireduino) => {
+      // If fireduino not found
+      if (!fireduino) {
+        // Reject the promise
+        callback(null, ErrorCode.DEVICE_NOT_FOUND);
+        return;
+      }
+
+      // Get establishment
+      this.getEstablishmentById(estbID, (establishment) => {
+        // If has error
+        if (!establishment) {
+          // Reject the promise
+          callback(null, ErrorCode.SYSTEM_ERROR);
+          return;
+        }
+
+        // Get establishment's coordinates
+        const { latitude, longitude } = establishment;
+
+        // Get nearest fire department
+        getNearestFireDepartment(Number(latitude), Number(longitude), (dept) => {
+          // If there is an error
+          if (!dept) {
+            // Reject the promise
+            callback(null, ErrorCode.SYSTEM_ERROR);
+            return;
+          }
+
+          // Send SMS
+          this.sendSMS(establishment, dept, (smsID) => {
+            // Add the incident
+            this.query("INSERT INTO incidents (estb_id, device_id, dept_id, sms_id, date_stamp) VALUES (?, ?, ?, ?, NOW())", [estbID, fireduino.id, dept.id, smsID], (error, results) => {
+              // If there is an error
+              if (error) {
+                // Reject the promise
+                console.error(error);
+                callback(null, ErrorCode.CREATE_INCIDENT);
+                return;
+              }
+        
+              // Otherwise, resolve the promise
+              callback(results.insertId, null);
+            });
+          });
+        });
+      });
+    });
+  }
+
+  /**
+   * Send an SMS to the fire department
+   */
+  public sendSMS(estb: Establishment, dept: FireDepartment, callback: (smsID: number | null) => void) {
+    // Get sms template
+    this.getSmsTemplate(estb.id!, (template) => {
+      // If there is an error
+      if (template === null) {
+        // Reject the promise
+        callback(null);
+        return;
+      }
+
+      // Send the SMS synchronously
+      sendSMS(estb.phone, dept.phone, template);
+
+      // Add the SMS to the database
+      this.query("INSERT INTO sms_history (dept_id, date_stamp) VALUES (?, NOW())", [dept.id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null);
+          return;
+        }
+  
+        // Otherwise, resolve the promise
+        callback(results.insertId);
+      });
+    });
+  }
+
+  /**
+   * Get SMS template
+   */
+  public getSmsTemplate(estbID: number, callback: (template: string | null) => void) {
+    // Get sms template
+    this.query("SELECT template FROM sms_template WHERE estb_id = ?", [estbID], (error, results) => {
+      // If there is an error
+      if (error) {
+        // Reject the promise
+        console.error(error);
+        callback(null);
+        return;
+      }
+
+      // If there is no result
+      if (results.length === 0) {
+        // Default template
+        callback("Fire incident at {establishment} ({location}). Please respond immediately.");
+        return;
+      }
+
+      // Otherwise, resolve the promise
+      callback(results[0].template);
     });
   }
 

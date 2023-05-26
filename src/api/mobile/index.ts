@@ -10,5 +10,6 @@ export * from "./reports";
 export * from "./user";
 export * from "./login";
 export * from "./verify";
+export * from "./validateEmail";
 export * from "./edit_history";
 export * from "./login_history";

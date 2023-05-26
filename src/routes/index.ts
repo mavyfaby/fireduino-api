@@ -14,14 +14,14 @@ import {
     establishments as mEstablishments,
     departments as mDepartments, edit_history,
     login_history, verify, user, fireduino, fireduinos, dashboard,
-    accessLogs, accessDevice, incidentReports, incidentReport
+    accessLogs, accessDevice, incidentReports, incidentReport,
+    validateEmail
 } from '../api/mobile';
 
 import { establishments as wEstablishments } from '../api/ws';
 
 // Import validation functions
 import { validate } from '../api/validate';
-import { validateEmail } from '../api/mobile/validateEmail';
 
 /**
  * Fireduino API routes
@@ -56,7 +56,7 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/report', methods: ["POST", "PUT"], handler: incidentReport },
 
     // WebSocket API
-    { path: '/ws/establishments', methods: ["GET"], handler: wEstablishments },
+    { path: '/ws/establishments', methods: ["GET"], handler: wEstablishments }
 ];
 
 export default routes;
