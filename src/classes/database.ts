@@ -1,7 +1,7 @@
 import {
   AccountType, CreateUserData, DatabaseTable, EditUserType, ErrorCode,
   Establishment, FireDepartment, IncidentReport, SearchParams, User,
-  EditHistory, EditType
+  EditHistory, EditType, SmsHistory
 } from "../types";
 
 import mysql from "mysql";
@@ -16,14 +16,14 @@ import { sendSMS } from "../utils/sms";
  */
 export class FireduinoDatabase {
   private static instance: FireduinoDatabase;
-  private static pool: mysql.Connection;
+  private static pool: mysql.Pool;
 
   /**
    * Create a database connection pool
    */
   private constructor() {
     // Create a database connection pool
-    FireduinoDatabase.pool = mysql.createConnection({
+    FireduinoDatabase.pool = mysql.createPool({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
@@ -183,7 +183,10 @@ export class FireduinoDatabase {
     if (typeof search === "string" && search.trim().length > 0) {
       query += " WHERE name LIKE ?";
       params.push("%" + search.trim() + "%");
+
     }
+
+    console.log("Searching...");
 
     this.query(query, params, (error, results) => {
       // If there is an error
@@ -205,9 +208,10 @@ export class FireduinoDatabase {
         getDistance(origin, results.map((dep: any) => new LatLng(Number(dep.e), Number(dep.f))), (distance) => {
           // Loop through the results
           for (let i = 0; i < results.length; i++) {
-            results[i].distance = distance[i].distance;
-            results[i].duration = distance[i].duration;
+            results[i].distance = distance[i].travelDistance;
           }
+
+          console.log("Done Searching...");
 
           // Otherwise, resolve the promise
           callback(results);
@@ -1086,40 +1090,18 @@ export class FireduinoDatabase {
    * Send an SMS to the fire department
    */
   public sendSMS(estb: Establishment, dept: FireDepartment, callback: (smsID: number | null) => void) {
-    // Get sms template
-    this.getSmsTemplate(estb.id!, (template) => {
-      // If there is an error
-      if (template === null) {
-        // Reject the promise
-        callback(null);
-        return;
-      }
+    // Default template
+    let template = "Fire incident at {establishment} located {location}. Please respond immediately!";
 
-      // Send the SMS synchronously
-      sendSMS(dept.phone, template);
+    // Replace the template
+    template = template.replace("{establishment}", estb.name);
+    template = template.replace("{location}", estb.address);
 
-      // Add the SMS to the database
-      this.query("INSERT INTO sms_history (dept_id, date_stamp) VALUES (?, NOW())", [dept.id], (error, results) => {
-        // If there is an error
-        if (error) {
-          // Reject the promise
-          console.error(error);
-          callback(null);
-          return;
-        }
-  
-        // Otherwise, resolve the promise
-        callback(results.insertId);
-      });
-    });
-  }
+    // Send the SMS synchronously
+    sendSMS(dept.phone, template);
 
-  /**
-   * Get SMS template
-   */
-  public getSmsTemplate(estbID: number, callback: (template: string | null) => void) {
-    // Get sms template
-    this.query("SELECT template FROM sms_template WHERE estb_id = ?", [estbID], (error, results) => {
+    // Add the SMS to the database
+    this.query("INSERT INTO sms_history (dept_id, date_stamp) VALUES (?, NOW())", [dept.id], (error, results) => {
       // If there is an error
       if (error) {
         // Reject the promise
@@ -1128,15 +1110,8 @@ export class FireduinoDatabase {
         return;
       }
 
-      // If there is no result
-      if (results.length === 0) {
-        // Default template
-        callback("Fire incident at {establishment} ({location}). Please respond immediately.");
-        return;
-      }
-
       // Otherwise, resolve the promise
-      callback(results[0].template);
+      callback(results.insertId);
     });
   }
 
@@ -1224,6 +1199,37 @@ export class FireduinoDatabase {
 
       // Otherwise, resolve the promise
       callback(results[0][column]);
+    });
+  }
+
+  /**
+   * Get SMS history
+   */
+  public getSmsHistory(token: string, callback: (result: SmsHistory[] | null, errorCode: ErrorCode | null) => void) { 
+    // Get user by token
+    this.getUserByToken(token, (user, error) => {
+      // If there is an error
+      if (error || !user) {
+        // Reject the promise
+        callback(null, error);
+        return;
+      }
+
+      // Get the edit history
+      this.query(`
+        SELECT fd.name, s.date_stamp FROM sms_history s INNER JOIN fire_departments fd ON fd.id = s.dept_id ORDER BY s.date_stamp DESC
+      `, [user.id], (error, results) => {
+        // If there is an error
+        if (error) {
+          // Reject the promise
+          console.error(error);
+          callback(null, ErrorCode.SMS_HISTORY);
+          return;
+        }
+
+        // Otherwise, resolve the promise
+        callback(results, null);
+      });
     });
   }
 }

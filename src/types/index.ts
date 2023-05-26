@@ -39,6 +39,7 @@ export enum ErrorCode {
   EDIT_HISTORY,
   EDIT_REPORT,
   CREATE_INCIDENT,
+  SMS_HISTORY,
   LOGIN_HISTORY,
   INVALID_TOKEN
 }
@@ -103,6 +104,7 @@ export type IncidentReport = {
 }
 
 export type SearchParams = {
+  id?: number;
   search?: string;
   isNameOnly?: boolean;
   sortBy?: string;
@@ -115,6 +117,11 @@ export type EditHistory = {
   name: string;
   before: string;
   after: string;
+}
+
+export type SmsHistory = {
+  dept_name: string;
+  date: string;
 }
 
 export enum EditType {

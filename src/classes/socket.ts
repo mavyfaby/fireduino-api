@@ -11,11 +11,14 @@ export class FireduinoSocketClient {
   private socket: Socket;
 
   private constructor() {
-    this.socket = io("https://fireduino-ws.azurewebsites.net/api", {
-      transports: ["websocket"],
-    });
+    let url = "http://127.0.0.1:5000/api";
+
+    if (process.env.NODE_ENV === "production") {
+      url = "https://fireduino-ws.azurewebsites.net/api";
+    }
 
     console.log("Connecting to socket server...");
+    this.socket = io(url, { transports: ["websocket"] });
 
     // Listen for connection
     this.socket.on("connect", () => {

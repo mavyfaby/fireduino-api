@@ -1,4 +1,5 @@
 export * from "./establishments";
+export * from "./establishment";
 export * from "./departments";
 export * from "./dashboard";
 export * from "./fireduino";
@@ -13,3 +14,4 @@ export * from "./verify";
 export * from "./validateEmail";
 export * from "./edit_history";
 export * from "./login_history";
+export * from "./sms_history";

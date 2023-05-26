@@ -1,31 +1,30 @@
 import { FireduinoDatabase } from "../classes/database";
+import { FireDepartment } from "../types";
 import LatLng from "../models/latlng";
-import { ErrorCode, FireDepartment } from "../types";
+import axios from "axios";
 
 /**
  * Get the street distance between two points
  * @param origin Origin's latitude and longitude
  * @param destination Destination's latitude and longitude
  */
-export async function getDistance(origin: LatLng, destination: LatLng[], callback: (result: any) => void) {
-  // API URL
-  let api = `https://api.distancematrix.ai/maps/api/distancematrix/json?key=${process.env.DISTANCE_KEY}&origins=${origin.lat}%2C${origin.lng}&destinations=`;
+export async function getDistance(origin: LatLng, destination: LatLng[], callback: (result: any[]) => void) {
+  // // API URL
+  let api = `https://dev.virtualearth.net/REST/v1/Routes/DistanceMatrix?travelMode=driving&key=${process.env.DISTANCE_KEY}&origins=${origin.lat}%2C${origin.lng}&destinations=`;
 
   // Add destinations
   for (let i = 0; i < destination.length; i++) {
     api += `${destination[i].lat}%2C${destination[i].lng}`;
 
     if (i < destination.length - 1) {
-      api += "%7C";
+      api += "%3B";
     }
   }
 
   // Fetch data
-  const response = fetch(api);
-  // Get json response
-  const data = await (await response).json();
+  const response = await axios.get(api);
   // Return data
-  callback(data.rows ? data.rows[0].elements : []);
+  callback(response.data.resourceSets[0].resources[0].results);
 }
 
 /**
@@ -49,7 +48,7 @@ export async function getNearestFireDepartment(latitude: number, longitude: numb
     // Get distance
     getDistance(new LatLng(latitude, longitude), departments.map(d => new LatLng(Number(d.e), Number(d.f))), (depts) => {
       // If error
-      if (depts == null) {
+      if (depts == null || depts.length === 0) {
         // Declare message
         console.error("System Error [GET_NFD]: Failed to get nearest fire department!");
         // Send error
@@ -58,9 +57,9 @@ export async function getNearestFireDepartment(latitude: number, longitude: numb
       }
 
       // Get minimum distance
-      const min = Math.min(...depts.map((r: any) => r.distance.value));
+      const min = Math.min(...depts.map((r: any) => r.travelDistance));
       // Get index of minimum distance
-      const index = depts.findIndex((r: any) => r.distance.value === min);
+      const index = depts.findIndex(r => r.travelDistance === min);
 
       // Send success
       callback({

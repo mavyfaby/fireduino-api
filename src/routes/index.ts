@@ -5,17 +5,18 @@ import type { FireduinoRoutes } from '../types';
 import {
     login as loginAdmin,
     departments as aDepartments,
-    department, establishment,
+    department, establishment as aEstablishment,
     establishments as aEstablishments, inviteKey, config
 } from '../api/admin';
 
 import {
     login as loginMobile,
+    establishment as mEstablishment,
     establishments as mEstablishments,
     departments as mDepartments, edit_history,
     login_history, verify, user, fireduino, fireduinos, dashboard,
     accessLogs, accessDevice, incidentReports, incidentReport,
-    validateEmail
+    validateEmail, sms_history
 } from '../api/mobile';
 
 import { establishments as wEstablishments } from '../api/ws';
@@ -34,10 +35,11 @@ const routes: FireduinoRoutes[] = [
     { path: '/admin/login', methods: ["POST"], handler: loginAdmin, },
     { path: '/admin/department', methods: ["GET", "POST", "PUT"], handler: department, },
     { path: '/admin/departments', methods: ["GET"], handler: aDepartments, },
-    { path: '/admin/establishment', methods: ["GET", "POST", "PUT"], handler: establishment, },
+    { path: '/admin/establishment', methods: ["GET", "POST", "PUT"], handler: aEstablishment, },
     { path: '/admin/establishments', methods: ["GET"], handler: aEstablishments, },
     
     // Mobile Client API
+    { path: '/mobile/establishment', methods: ["GET", "POST", "PUT"], handler: mEstablishment, },
     { path: '/mobile/establishments', methods: ["GET"], handler: mEstablishments, },
     { path: '/mobile/departments', methods: ["GET"], handler: mDepartments, },
     { path: '/mobile/verify', methods: ["POST"], handler: verify, },
@@ -54,6 +56,7 @@ const routes: FireduinoRoutes[] = [
     { path: '/mobile/access', methods: ["POST"], handler: accessDevice },
     { path: '/mobile/reports', methods: ["GET"], handler: incidentReports },
     { path: '/mobile/report', methods: ["POST", "PUT"], handler: incidentReport },
+    { path: '/mobile/smshistory', methods: ["GET"], handler: sms_history },
 
     // WebSocket API
     { path: '/ws/establishments', methods: ["GET"], handler: wEstablishments }
